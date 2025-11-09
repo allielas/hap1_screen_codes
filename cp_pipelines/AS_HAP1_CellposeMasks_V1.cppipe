@@ -1,0 +1,1436 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:5
+DateRevision:428
+GitHash:
+ModuleCount:88
+HasImagePlaneDetails:False
+
+Images:[module_num:1|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:["Exclude the columns that don't have mitotractker/LAMP1"]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    :
+    Filter images?:Custom
+    Select the rule criteria:and (file doesnot contain "c12") (directory doesnot contain "old") (file doesnot contain "r02") (file doesnot contain "r03") (file doesnot contain "r04c02") (file doesnot contain "r04c03") (file doesnot contain "r04c04") (file doesnot contain "r04c05")
+
+Metadata:[module_num:2|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['The Metadata module optionally allows you to extract information describing your images (i.e, metadata) which will be stored along with your measurements. This information can be contained in the file name and/or location, or in an external file.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Extract metadata?:Yes
+    Metadata data type:Text
+    Metadata types:{}
+    Extraction method count:2
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression to extract from file name:r(?P<WellRow>\d{2})c(?P<WellColumn>\d{2})f(?P<Field>\d{2})
+    Regular expression to extract from folder name:(?P<Date>[0-9]{4}_[0-9]{2}_[0-9]{2})$
+    Extract metadata from:All images
+    Select the filtering criteria:and (file does contain "")
+    Metadata file location:Elsewhere...|
+    Match file and image metadata:[]
+    Use case insensitive matching?:No
+    Metadata file name:None
+    Does cached metadata exist?:No
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression to extract from file name:ch(?P<Channels>\d{1})
+    Regular expression to extract from folder name:(?P<Date>[0-9]{4}_[0-9]{2}_[0-9]{2})$
+    Extract metadata from:Images matching a rule
+    Select the filtering criteria:and (file does contain "ch")
+    Metadata file location:Elsewhere...|
+    Match file and image metadata:[]
+    Use case insensitive matching?:No
+    Metadata file name:None
+    Does cached metadata exist?:No
+
+NamesAndTypes:[module_num:3|svn_version:'Unknown'|variable_revision_number:8|show_window:False|notes:['The NamesAndTypes module allows you to assign a meaningful name to each image by which other modules will refer to it.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Assign a name to:Images matching rules
+    Select the image type:Grayscale image
+    Name to assign these images:DNA
+    Match metadata:[{'Cell_Masks': 'Well', 'DAPI_MAX': 'Well', 'Nuclei_Masks': 'Well', 'Alexa488_MAX': 'Well', 'Alexa594_MAX': 'Well', 'WGA_MAX': 'Well'}, {'Cell_Masks': 'WellRow', 'DAPI_MAX': 'WellRow', 'Nuclei_Masks': 'WellRow', 'Alexa488_MAX': 'WellRow', 'Alexa594_MAX': 'WellRow', 'WGA_MAX': 'WellRow'}, {'Cell_Masks': 'WellColumn', 'DAPI_MAX': 'WellColumn', 'Nuclei_Masks': 'WellColumn', 'Alexa488_MAX': 'WellColumn', 'Alexa594_MAX': 'WellColumn', 'WGA_MAX': 'WellColumn'}, {'Cell_Masks': 'Field', 'DAPI_MAX': 'Field', 'Nuclei_Masks': 'Field', 'Alexa488_MAX': 'Field', 'Alexa594_MAX': 'Field', 'WGA_MAX': 'Field'}]
+    Image set matching method:Metadata
+    Set intensity range from:Image metadata
+    Assignments count:6
+    Single images count:0
+    Maximum intensity:4294967295
+    Process as 3D?:No
+    Relative pixel spacing in X:1.0
+    Relative pixel spacing in Y:1.0
+    Relative pixel spacing in Z:1.0
+    Select the rule criteria:and (metadata does Channels "3") (file does contain "MAX")
+    Name to assign these images:DAPI_MAX
+    Name to assign these objects:Cell
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (metadata does Channels "2") (file does contain "MAX")
+    Name to assign these images:Alexa488_MAX
+    Name to assign these objects:Nucleus
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (metadata does Channels "1") (file does contain "MAX")
+    Name to assign these images:Alexa594_MAX
+    Name to assign these objects:Cytoplasm
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (file does contain "cell") (file does contain "masks") (extension does istif)
+    Name to assign these images:Cell_Masks
+    Name to assign these objects:Cell_Masks
+    Select the image type:Objects
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (file does contain "nuclei") (file does contain "masks")
+    Name to assign these images:DNA
+    Name to assign these objects:Nuclei_Masks
+    Select the image type:Objects
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (metadata does Channels "4") (file does contain "MAX")
+    Name to assign these images:WGA_MAX
+    Name to assign these objects:Object1
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+
+Groups:[module_num:4|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['The Groups module optionally allows you to split your list of images into image subsets (groups) which will be processed independently of each other. Examples of groupings include screening batches, microtiter plates, time-lapse movies, etc.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Do you want to group your images?:No
+    grouping metadata count:1
+    Metadata category:None
+
+CorrectIlluminationCalculate:[module_num:5|svn_version:'Unknown'|variable_revision_number:2|show_window:True|notes:['Correct mitotracker bg intensity']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Alexa488_MAX
+    Name the output image:Illum_Green
+    Select how the illumination function is calculated:Background
+    Dilate objects in the final averaged image?:No
+    Dilation radius:1
+    Block size:20
+    Rescale the illumination function?:No
+    Calculate function for each image individually, or based on all images?:Each
+    Smoothing method:Gaussian Filter
+    Method to calculate smoothing filter size:Manually
+    Approximate object diameter:10
+    Smoothing filter size:20
+    Retain the averaged image?:No
+    Name the averaged image:IllumBlueAvg
+    Retain the dilated image?:No
+    Name the dilated image:IllumBlueDilated
+    Automatically calculate spline parameters?:No
+    Background mode:dark
+    Number of spline points:5
+    Background threshold:2.0
+    Image resampling factor:2.0
+    Maximum number of iterations:40
+    Residual value for convergence:0.001
+
+CorrectIlluminationCalculate:[module_num:6|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Correct LAMP1 background intensity']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Alexa594_MAX
+    Name the output image:Illum_Red
+    Select how the illumination function is calculated:Background
+    Dilate objects in the final averaged image?:No
+    Dilation radius:1
+    Block size:20
+    Rescale the illumination function?:No
+    Calculate function for each image individually, or based on all images?:Each
+    Smoothing method:Gaussian Filter
+    Method to calculate smoothing filter size:Manually
+    Approximate object diameter:10
+    Smoothing filter size:30
+    Retain the averaged image?:No
+    Name the averaged image:IllumBlueAvg
+    Retain the dilated image?:No
+    Name the dilated image:IllumBlueDilated
+    Automatically calculate spline parameters?:Yes
+    Background mode:auto
+    Number of spline points:5
+    Background threshold:2.0
+    Image resampling factor:2.0
+    Maximum number of iterations:40
+    Residual value for convergence:0.001
+
+CorrectIlluminationApply:[module_num:7|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Apply bg subtraction functions']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Alexa488_MAX
+    Name the output image:CorrGreen_MAX
+    Select the illumination function:Illum_Green
+    Select how the illumination function is applied:Subtract
+    Select the input image:Alexa594_MAX
+    Name the output image:CorrRed_MAX
+    Select the illumination function:Illum_Red
+    Select how the illumination function is applied:Subtract
+    Set output image values less than 0 equal to 0?:Yes
+    Set output image values greater than 1 equal to 1?:Yes
+
+ErodeObjects:[module_num:8|svn_version:'Unknown'|variable_revision_number:1|show_window:True|notes:['First part of an opeining']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:Cell_Masks
+    Name the output object:ErodeCellMasks
+    Structuring element:Disk,2
+    Prevent object removal:Yes
+    Relabel resulting objects:No
+
+DilateObjects:[module_num:9|svn_version:'Unknown'|variable_revision_number:1|show_window:True|notes:['second part of an opening - keep the structuring element the same as previous']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:ErodeCellMasks
+    Name the output object:DilateCellMasks
+    Structuring element:Disk,2
+
+ResizeObjects:[module_num:10|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:DilateCellMasks
+    Name the output object:ResizeCellMasks
+    Method:Match Image
+    X Factor:2
+    Y Factor:2
+    Z Factor:0.25
+    Width (X):100
+    Height (Y):100
+    Planes (Z):10
+    Select the image with the desired dimensions:DAPI_MAX
+
+ResizeObjects:[module_num:11|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:['Resize nuclear masks']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:Nuclei_Masks
+    Name the output object:ResizeNucleiMasks
+    Method:Match Image
+    X Factor:2
+    Y Factor:2
+    Z Factor:0.25
+    Width (X):100
+    Height (Y):100
+    Planes (Z):10
+    Select the image with the desired dimensions:DAPI_MAX
+
+FilterObjects:[module_num:12|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Filter to remove nuclei touching borders']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:ResizeNucleiMasks
+    Name the output objects:OrigFilteredNuclei
+    Select the filtering mode:Image or mask border
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:None
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:RemovedObjects
+    Select the measurement to filter by:AreaShape_Area
+    Filter using a minimum measurement value?:Yes
+    Minimum value:0.0
+    Filter using a maximum measurement value?:Yes
+    Maximum value:1.0
+    Allow fuzzy feature matching?:No
+
+RelateObjects:[module_num:13|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Relate nuclei to the orignal cell objects and save the nuclei that belong to these cells', '']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:ResizeCellMasks
+    Child objects:OrigFilteredNuclei
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:Yes
+    Name the output object:AllNuclei
+    Parent name:None
+
+FilterObjects:[module_num:14|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Filter cells out without nuclei or with multiple nuclei (positively) - in case I want to analyze these filtered-out cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:ResizeCellMasks
+    Name the output objects:ValidCells
+    Select the filtering mode:Measurements
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:Cell_Masks
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:NotRemovedCells
+    Select the measurement to filter by:Children_OrigFilteredNuclei_Count
+    Filter using a minimum measurement value?:Yes
+    Minimum value:1
+    Filter using a maximum measurement value?:No
+    Maximum value:2
+    Allow fuzzy feature matching?:No
+
+FilterObjects:[module_num:15|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Multinuc cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:ResizeCellMasks
+    Name the output objects:Multinucleate_Cells
+    Select the filtering mode:Measurements
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:Cell_Masks
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:NotRemovedCells
+    Select the measurement to filter by:Children_OrigFilteredNuclei_Count
+    Filter using a minimum measurement value?:Yes
+    Minimum value:2
+    Filter using a maximum measurement value?:No
+    Maximum value:2
+    Allow fuzzy feature matching?:No
+
+FlagImage:[module_num:16|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Flag an image to remove images with no cells, no nuclei, or a tiny amount of cell area', 'Stops crashes when going to overlay objects']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Hidden:2
+    Hidden:1
+    Name the flag's category:Metadata
+    Name the flag:EmptyImage_Cells
+    How should measurements be linked?:Flag if any fail
+    Skip image set if flagged?:Yes
+    Flag is based on:Whole-image measurement
+    Select the object to be used for flagging:Cell
+    Which measurement?:Count_ResizeCellMasks
+    Flag images based on low values?:Yes
+    Minimum value:1.0
+    Flag images based on high values?:No
+    Maximum value:1.0
+    Rules file location:Elsewhere...|
+    Rules file name:rules.txt
+    Class number:
+    Allow fuzzy feature matching?:No
+    Hidden:1
+    Name the flag's category:Metadata
+    Name the flag:EmptyImage_Nuclei
+    How should measurements be linked?:Flag if any fail
+    Skip image set if flagged?:Yes
+    Flag is based on:Whole-image measurement
+    Select the object to be used for flagging:None
+    Which measurement?:Count_AllNuclei
+    Flag images based on low values?:Yes
+    Minimum value:1.0
+    Flag images based on high values?:No
+    Maximum value:1.0
+    Rules file location:Elsewhere...|
+    Rules file name:rules.txt
+    Class number:
+    Allow fuzzy feature matching?:No
+    Ignore flag skips on last cycle?:No
+
+Smooth:[module_num:17|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:DAPI_MAX
+    Name the output image:SmoothNuc
+    Select smoothing method:Median Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:10
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:No
+
+OverlayObjects:[module_num:18|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Input:DAPI_MAX
+    Name the output image:OverlayObjects
+    Objects:AllCells
+    Opacity:0.3
+
+MeasureImageQuality:[module_num:19|svn_version:'Unknown'|variable_revision_number:6|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Calculate metrics for which images?:Select...
+    Image count:1
+    Scale count:4
+    Threshold count:1
+    Select the images to measure:Alexa488_MAX, DAPI_MAX
+    Include the image rescaling value?:No
+    Calculate blur metrics?:Yes
+    Spatial scale for blur measurements:5
+    Spatial scale for blur measurements:10
+    Spatial scale for blur measurements:20
+    Spatial scale for blur measurements:50
+    Calculate saturation metrics?:Yes
+    Calculate intensity metrics?:Yes
+    Calculate thresholds?:Yes
+    Use all thresholding methods?:No
+    Select a thresholding method:Otsu
+    Typical fraction of the image covered by objects:0.1
+    Two-class or three-class thresholding?:Two classes
+    Minimize the weighted variance or the entropy?:Weighted variance
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+
+HistogramEqualization:[module_num:20|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Equalize to enhance brighness and aid object detection with unequal backgrounds. Based on MitoPhe https://pmc.ncbi.nlm.nih.gov/articles/PMC8560386/']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:CorrMitoTracker_MAX
+    Name the output image:EqualizationMito
+    Bins:256
+    Mask:Leave blank
+    Local:Yes
+    Tile Size:10
+    Clip limit:0.02
+    Is your image 3D?:No
+    Do framewise calculation?:No
+    Tile Size (Z):5
+
+HistogramEqualization:[module_num:21|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Also scale lysosomes']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:CorrLAMP1_MAX
+    Name the output image:EqualizationLAMP1
+    Bins:256
+    Mask:Leave blank
+    Local:Yes
+    Tile Size:15
+    Clip limit:0.01
+    Is your image 3D?:No
+    Do framewise calculation?:No
+    Tile Size (Z):5
+
+ImageMath:[module_num:22|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Make a composite for 2* objects to find and for visualization']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Operation:Add
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:No
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:ImageAfterMath
+    Image or measurement?:Image
+    Select the first image:EqualizationMito
+    Multiply the first image by:2.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:EqualizationLAMP1
+    Multiply the second image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the third image:DAPI_MAX
+    Multiply the third image by:1.0
+    Measurement:
+
+Smooth:[module_num:23|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Smooth the compsosite']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:ImageAfterMath
+    Name the output image:SmoothCellOutline
+    Select smoothing method:Median Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:2
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:Yes
+
+EnforceObjectsOneToOne:[module_num:24|svn_version:'Unknown'|variable_revision_number:1|show_window:True|notes:['Force cell and nuclei to be 1:1 to handle the cases where there are multiple nuclei / nuclei overlapping out of bounds. This will be the final cell/nuclei object set for our purposes']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Pre-primary objects:AllNuclei
+    Pre-secondary objects:ResizeCellMasks
+    Name the output primary object:Nuclei
+    Name the output secondary object:Cell
+    In module display, show enforced objects on a selected image?:Yes
+    Select the image for visualization:DAPI_MAX
+
+OverlayOutlines:[module_num:25|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Overlay onto an image to assess segmentation']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:DAPI_MAX
+    Name the output image:OrigOverlay
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#ADD8E6
+    Select objects to display:Nuclei
+    Select outline color:Green
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:26|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Same as above but on a blank image to use for later if need be']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:True]
+    Display outlines on a blank image?:Yes
+    Select image on which to display outlines:DAPI_MAX
+    Name the output image:Segmentation_Overlay
+    Outline display mode:Grayscale
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#ADD8E6
+    Select objects to display:Nuclei
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+IdentifyTertiaryObjects:[module_num:27|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Cytoplasm - good to help with cytominer']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the larger identified objects:Cell
+    Select the smaller identified objects:Nuclei
+    Name the tertiary objects to be identified:Cytoplasm
+    Shrink smaller object prior to subtraction?:Yes
+
+EnhanceOrSuppressFeatures:[module_num:28|svn_version:'Unknown'|variable_revision_number:7|show_window:False|notes:['Enhance lyso puncta']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:EqualizationLAMP1
+    Name the output image:EnhancedLAMP1
+    Select the operation:Enhance
+    Feature size:10
+    Feature type:Speckles
+    Range of hole sizes:2,30
+    Smoothing scale:2.0
+    Shear angle:0.0
+    Decay:0.95
+    Enhancement method:Tubeness
+    Speed and accuracy:Slow
+    Rescale result image:No
+
+Smooth:[module_num:29|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Filter the puncta']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:EnhancedLAMP1
+    Name the output image:SmoothLAMP1Puncta
+    Select smoothing method:Median Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:2
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:Yes
+
+MaskImage:[module_num:30|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Mask lysosomes to only measure within cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:SmoothLAMP1Puncta
+    Name the output image:MaskLAMP1Puncta
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+IdentifyPrimaryObjects:[module_num:31|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Find lyso puncta']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MaskLAMP1Puncta
+    Name the primary objects to be identified:LysosomePuncta
+    Typical diameter of objects, in pixel units (Min,Max):3,50
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Intensity
+    Method to draw dividing lines between clumped objects:Propagate
+    Size of smoothing filter:2
+    Suppress local maxima that are closer than this minimum allowed distance:3
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After declumping only
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Robust Background
+    Threshold smoothing scale:0
+    Threshold correction factor:0.8
+    Lower and upper bounds on threshold:0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:30
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2
+    Thresholding method:Robust Background
+
+Smooth:[module_num:32|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Smooth the lysososomes themselves']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:EqualizationLAMP1
+    Name the output image:SmoothEqualizedLAMP1
+    Select smoothing method:Gaussian Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:2
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:Yes
+
+MaskImage:[module_num:33|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Mask the smoothed original lamp1 image']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:SmoothEqualizedLAMP1
+    Name the output image:MaskSmoothEqualizedLAMP1
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+IdentifySecondaryObjects:[module_num:34|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Expand the lysosomes by propagation using puncta as seeds; not 100% accurate but it its what it is']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:LysosomePuncta
+    Name the objects to be identified:UnfilteredLysosomes
+    Select the method to identify the secondary objects:Propagation
+    Select the input image:MaskSmoothEqualizedLAMP1
+    Number of pixels by which to expand the primary objects:10
+    Regularization factor:3
+    Discard secondary objects touching the border of the image?:No
+    Discard the associated primary objects?:No
+    Name the new primary objects:FilteredNuclei
+    Fill holes in identified objects?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:0.0
+    Threshold correction factor:1.5
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Three classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+IdentifyPrimaryObjects:[module_num:35|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['An attempt at finding the big lysosomes and adding to the set - future maybe']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:SmoothEqualizedLAMP1
+    Name the primary objects to be identified:BigLysosome
+    Typical diameter of objects, in pixel units (Min,Max):10,90
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Intensity
+    Size of smoothing filter:2
+    Suppress local maxima that are closer than this minimum allowed distance:4
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:Yes
+    Automatically calculate minimum allowed distance between local maxima?:Yes
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:0
+    Threshold correction factor:1.5
+    Lower and upper bounds on threshold:0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:30
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+EnhanceOrSuppressFeatures:[module_num:36|svn_version:'Unknown'|variable_revision_number:7|show_window:False|notes:['Now enhance the neurites - but on the illum corrected image, not the equalization image to avoid amplifying bg']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:CorrMitoTracker_MAX
+    Name the output image:EnhancedMito
+    Select the operation:Enhance
+    Feature size:10
+    Feature type:Neurites
+    Range of hole sizes:1,10
+    Smoothing scale:1
+    Shear angle:0.0
+    Decay:0.95
+    Enhancement method:Tubeness
+    Speed and accuracy:Fast
+    Rescale result image:Yes
+
+MaskImage:[module_num:37|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Mask Mitotracker enhanced img to only identify objects within cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:EnhancedMito
+    Name the output image:MaskedNeuritesMitoTracker
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+MaskImage:[module_num:38|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:EqualizationMito
+    Name the output image:MaskedEqualizationMitoTracker
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+Threshold:[module_num:39|svn_version:'Unknown'|variable_revision_number:12|show_window:False|notes:['Theshold the mitochondria with a global cross-entropy filter', 'DON"T use CLAHE with this; the bg noise will be amplified too much. Or use median filter', 'see https://www.sciencedirect.com/science/article/pii/S2215016122000693?via%3Dihub#fig0004', '']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MaskedNeuritesMitoTracker
+    Name the output image:ThresholdMito
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:1.3488
+    Threshold correction factor:1.2
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:25
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Minimum Cross-Entropy
+
+IdentifyPrimaryObjects:[module_num:40|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Alternate ve5rsion']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:ThresholdMito
+    Name the primary objects to be identified:UnfilteredMitochondria
+    Typical diameter of objects, in pixel units (Min,Max):5,300
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:None
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:40
+    Suppress local maxima that are closer than this minimum allowed distance:40
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:Never
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Manual
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.5
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:25
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+Threshold:[module_num:41|svn_version:'Unknown'|variable_revision_number:12|show_window:False|notes:['Threshold the mito for segmentation of network with adaptive ostsu with clahe', 'Smooth it here, median filtering it will hemhorrage memory', 'See https://pmc.ncbi.nlm.nih.gov/articles/PMC8560386/']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MaskedEqualizationMitoTracker
+    Name the output image:ThresholdMito_Puncta
+    Threshold strategy:Adaptive
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:1.3488
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:Yes
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:250
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+IdentifyPrimaryObjects:[module_num:42|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Identify objects from the thresholded image - use manual threshold', 'See these for more info:', 'https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2022.855775/full', 'https://www.sciencedirect.com/science/article/pii/S2215016122000693?via%3Dihub#bib0011', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8560386/#sec2']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:ThresholdMito_Puncta
+    Name the primary objects to be identified:Mitochondria_Puncta
+    Typical diameter of objects, in pixel units (Min,Max):5,270
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:None
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:40
+    Suppress local maxima that are closer than this minimum allowed distance:40
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:Never
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Manual
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.5
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:25
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+FilterObjects:[module_num:43|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Remove the mito/lyso masks that are touching the cell mask border']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:UnfilteredLysosomes
+    Name the output objects:Lysosomes
+    Select the filtering mode:Image or mask border
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:None
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:RemovedObjects
+    Select the measurement to filter by:AreaShape_Area
+    Filter using a minimum measurement value?:Yes
+    Minimum value:0.0
+    Filter using a maximum measurement value?:Yes
+    Maximum value:1.0
+    Allow fuzzy feature matching?:No
+
+FilterObjects:[module_num:44|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Filter out mitochondria touching the cell mask border']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:UnfilteredMitochondria
+    Name the output objects:Mitochondria
+    Select the filtering mode:Image or mask border
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:None
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:RemovedObjects
+    Select the measurement to filter by:AreaShape_Area
+    Filter using a minimum measurement value?:Yes
+    Minimum value:0.0
+    Filter using a maximum measurement value?:Yes
+    Maximum value:1.0
+    Allow fuzzy feature matching?:No
+
+OverlayOutlines:[module_num:45|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Image for lyso/nuc outlines on lyso image']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationLAMP1
+    Name the output image:OutlinedLyso
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#59CF66
+    Select objects to display:Nuclei
+    Select outline color:#FF7D89
+    Select objects to display:Lysosomes
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:46|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Show cell/nuc/mito outlines on cell image']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationMito
+    Name the output image:OutlinedMito
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#59CF66
+    Select objects to display:Nuclei
+    Select outline color:#FF7D89
+    Select objects to display:Mitochondria
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:47|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationMito
+    Name the output image:OutlinedMito
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#59CF66
+    Select objects to display:Nuclei
+    Select outline color:#FF7D89
+    Select objects to display:Mitochondria_Puncta
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+Morph:[module_num:48|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Skeletonize mitochondria']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:ThresholdMito
+    Name the output image:MitoSkeletonPE
+    Select the operation to perform:skelpe
+    Number of times to repeat operation:Once
+    Repetition number:2
+    Rescale values from 0 to 1?:Yes
+
+ConvertObjectsToImage:[module_num:49|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Make a thresholded image of mito for skeletonization (excludes the garbage mito)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Mitochondria
+    Name the output image:MitoBinaryImg
+    Select the color format:Binary (black & white)
+    Select the colormap:Default
+
+MorphologicalSkeleton:[module_num:50|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Other method to skeletonize mitos']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MitoBinaryImg
+    Name the output image:MitoSkeleton
+
+Morph:[module_num:51|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Shrink down skeleton into endpoints']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MitoSkeleton
+    Name the output image:MitoEndpoints
+    Select the operation to perform:endpoints
+    Number of times to repeat operation:Forever
+    Repetition number:2
+    Rescale values from 0 to 1?:Yes
+
+IdentifyPrimaryObjects:[module_num:52|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Identify skeleton endpoints']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MitoEndpoints
+    Name the primary objects to be identified:MitoEndpoints
+    Typical diameter of objects, in pixel units (Min,Max):1,100
+    Discard objects outside the diameter range?:No
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:None
+    Method to draw dividing lines between clumped objects:Intensity
+    Size of smoothing filter:10
+    Suppress local maxima that are closer than this minimum allowed distance:7.0
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:Yes
+    Automatically calculate minimum allowed distance between local maxima?:Yes
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:1.3488
+    Threshold correction factor:1.0
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Minimum Cross-Entropy
+
+ExpandOrShrinkObjects:[module_num:53|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Identify mito end "seeds" from shrunken objects Find mito seeds']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:MitoEndpoints
+    Name the output objects:MitoEnds
+    Select the operation:Shrink objects to a point
+    Number of pixels by which to expand or shrink:1
+    Fill holes in objects so that all objects shrink to a single point?:No
+    Expand or shrink measurement:None
+
+ExpandOrShrinkObjects:[module_num:54|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Mitochondria
+    Name the output objects:SkeletonizedMitoObjects
+    Select the operation:Skeletonize each object
+    Number of pixels by which to expand or shrink:1
+    Fill holes in objects so that all objects shrink to a single point?:No
+    Expand or shrink measurement:None
+
+MeasureObjectSkeleton:[module_num:55|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the seed objects:Nuclei
+    Select the skeletonized image:MitoSkeleton
+    Retain the branchpoint image?:No
+    Name the branchpoint image:BranchpointImage
+    Fill small holes?:Yes
+    Maximum hole size:10
+    Export the skeleton graph relationships?:No
+    Intensity image:EnhancedMito
+    File output directory:Default Output Folder|skeleton
+    Vertex file name:vertices.csv
+    Edge file name:edges.csv
+
+MeasureObjectSkeleton:[module_num:56|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the seed objects:MitoEnds
+    Select the skeletonized image:MitoSkeleton
+    Retain the branchpoint image?:No
+    Name the branchpoint image:BranchpointImage
+    Fill small holes?:Yes
+    Maximum hole size:10
+    Export the skeleton graph relationships?:No
+    Intensity image:EnhancedMito
+    File output directory:Default Output Folder|skeleton
+    Vertex file name:vertices.csv
+    Edge file name:edges.csv
+
+MeasureObjectIntensityDistribution:[module_num:57|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['Intensity dist of the tubness-enhanced mito image']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:EnhancedMito
+    Hidden:2
+    Hidden:2
+    Hidden:1
+    Calculate intensity Zernikes?:None
+    Maximum zernike moment:9
+    Select objects to measure:Cell
+    Object to use as center?:Centers of other objects
+    Select objects to use as centers:Nuclei
+    Select objects to measure:Cytoplasm
+    Object to use as center?:Centers of other objects
+    Select objects to use as centers:Nuclei
+    Scale the bins?:Yes
+    Number of bins:16
+    Maximum radius:100
+    Scale the bins?:No
+    Number of bins:20
+    Maximum radius:300
+    Image:None
+    Objects to display:Cell
+    Number of bins:16
+    Measurement:Mean Fraction
+    Color map:Blues
+    Save display as image?:No
+    Output image name:Heatmap
+
+RescaleIntensity:[module_num:58|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Divide by the maximum value of 7 16-bit images summed together (for a sum  projection over 7 z slices) ', '65535*7=458745 to rescale to 01']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:LAMP1
+    Name the output image:RescaleIntensityLAMP1
+    Rescaling method:Divide each image by the same value
+    Method to calculate the minimum intensity:Custom
+    Method to calculate the maximum intensity:Custom
+    Lower intensity limit for the input image:0.0
+    Upper intensity limit for the input image:1.0
+    Intensity range for the input image:0.0,429496728
+    Intensity range for the output image:0.0,1.0
+    Select image to match in maximum intensity:EnhancedLAMP1
+    Divisor value:458745
+    Divisor measurement:None
+
+RescaleIntensity:[module_num:59|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Rescale mitotracker to 01']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:MitoTracker
+    Name the output image:RescaleIntensityMitoTracker
+    Rescaling method:Divide each image by the same value
+    Method to calculate the minimum intensity:Custom
+    Method to calculate the maximum intensity:Custom
+    Lower intensity limit for the input image:0.0
+    Upper intensity limit for the input image:1.0
+    Intensity range for the input image:0.0,429496728
+    Intensity range for the output image:0.0,1.0
+    Select image to match in maximum intensity:EnhancedLAMP1
+    Divisor value:458745
+    Divisor measurement:None
+
+RescaleIntensity:[module_num:60|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Dapi to 01']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:DAPI
+    Name the output image:RescaleIntensityDAPI
+    Rescaling method:Divide each image by the same value
+    Method to calculate the minimum intensity:Custom
+    Method to calculate the maximum intensity:Custom
+    Lower intensity limit for the input image:0.0
+    Upper intensity limit for the input image:1.0
+    Intensity range for the input image:0.0,429496728
+    Intensity range for the output image:0.0,1.0
+    Select image to match in maximum intensity:EnhancedLAMP1
+    Divisor value:458745
+    Divisor measurement:None
+
+MeasureGranularity:[module_num:61|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Granularity; also do it for the mito binary image as in https://pmc.ncbi.nlm.nih.gov/articles/PMC9026914/#sec0003', 'For nuc']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:True]
+    Select images to measure:RescaleIntensityDAPI, RescaleIntensityLAMP1, RescaleIntensityMitoTracker
+    Measure within objects?:Yes
+    Select objects to measure:Cell, Cytoplasm, Nuclei
+    Subsampling factor for granularity measurements:0.5
+    Subsampling factor for background reduction:0.5
+    Radius of structuring element:10
+    Range of the granular spectrum:16
+
+MeasureGranularity:[module_num:62|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['For the binary img of mito']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:MitoBinaryImg
+    Measure within objects?:Yes
+    Select objects to measure:Cell, Cytoplasm
+    Subsampling factor for granularity measurements:0.5
+    Subsampling factor for background reduction:0.5
+    Radius of structuring element:10
+    Range of the granular spectrum:16
+
+MeasureObjectIntensity:[module_num:63|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Nuc intensity']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:DAPI, DAPI_MAX
+    Select objects to measure:Cell, Cytoplasm, Nuclei
+
+MeasureObjectIntensity:[module_num:64|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Mito intensity']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:MitoTracker, MitoTracker_MAX
+    Select objects to measure:Cell, Cytoplasm, Mitochondria, Nuclei
+
+MeasureObjectIntensity:[module_num:65|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Lyso intensity']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:LAMP1, LAMP1_MAX
+    Select objects to measure:Cell, Cytoplasm, Lysosomes, Nuclei
+
+MeasureObjectIntensityDistribution:[module_num:66|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['Measure intensity distribution with 4 bins - using nuclei as the center']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:DAPI, LAMP1, MitoTracker
+    Hidden:3
+    Hidden:1
+    Hidden:1
+    Calculate intensity Zernikes?:None
+    Maximum zernike moment:5
+    Select objects to measure:Nuclei
+    Object to use as center?:These objects
+    Select objects to use as centers:Nuclei
+    Select objects to measure:Cytoplasm
+    Object to use as center?:These objects
+    Select objects to use as centers:Cell
+    Select objects to measure:Cell
+    Object to use as center?:Centers of other objects
+    Select objects to use as centers:Nuclei
+    Scale the bins?:Yes
+    Number of bins:4
+    Maximum radius:100
+    Image:MitoTracker
+    Objects to display:Cell
+    Number of bins:4
+    Measurement:Fraction at Distance
+    Color map:Blues
+    Save display as image?:No
+    Output image name:Heatmap
+
+MeasureObjectIntensityDistribution:[module_num:67|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['Measure intesnity dist using edge of the nucleus as the center - to avoid the size of the nucleus messing with the distribution']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:DAPI, LAMP1, MitoTracker
+    Hidden:1
+    Hidden:1
+    Hidden:1
+    Calculate intensity Zernikes?:None
+    Maximum zernike moment:5
+    Select objects to measure:Cell
+    Object to use as center?:Edges of other objects
+    Select objects to use as centers:Nuclei
+    Scale the bins?:Yes
+    Number of bins:4
+    Maximum radius:100
+    Image:MitoTracker
+    Objects to display:Cell
+    Number of bins:4
+    Measurement:Fraction at Distance
+    Color map:Blues
+    Save display as image?:No
+    Output image name:Heatmap
+
+MeasureObjectSizeShape:[module_num:68|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Areas']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select object sets to measure:AllNuclei, Cell, Cytoplasm, Lysosomes, Mitochondria, Mitochondria_Puncta, Multinucleate_Cells, Nuclei
+    Calculate the Zernike features?:Yes
+    Calculate the advanced features?:No
+
+MeasureObjectNeighbors:[module_num:69|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:Cell
+    Select neighboring objects to measure:Cell
+    Method to determine neighbors:Within a specified distance
+    Neighbor distance:5
+    Consider objects discarded for touching image border?:No
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Blues
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Oranges
+
+MeasureObjectNeighbors:[module_num:70|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select objects to measure:Cell
+    Select neighboring objects to measure:Cell
+    Method to determine neighbors:Adjacent
+    Neighbor distance:5
+    Consider objects discarded for touching image border?:No
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Blues
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Oranges
+
+MeasureObjectNeighbors:[module_num:71|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:Nuclei
+    Select neighboring objects to measure:Nuclei
+    Method to determine neighbors:Within a specified distance
+    Neighbor distance:1
+    Consider objects discarded for touching image border?:No
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Blues
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Oranges
+
+MeasureTexture:[module_num:72|svn_version:'Unknown'|variable_revision_number:7|show_window:False|notes:['Mitotracker Texture', 'Adding more as in cell painting https://github.com/broadinstitute/imaging-platform-pipelines/blob/master/JUMP_production/JUMP_analysis_v3.cppipe']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:RescaleIntensityDAPI, RescaleIntensityLAMP1, RescaleIntensityMitoTracker
+    Select objects to measure:Cell, Cytoplasm, Nuclei
+    Enter how many gray levels to measure the texture at:256
+    Hidden:3
+    Measure whole images or objects?:Objects
+    Texture scale to measure:3
+    Texture scale to measure:5
+    Texture scale to measure:10
+
+MeasureColocalization:[module_num:73|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Why not lol']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:RescaleIntensityDAPI, RescaleIntensityLAMP1, RescaleIntensityMitoTracker
+    Set threshold as percentage of maximum intensity for the images:15.0
+    Select where to measure correlation:Within objects
+    Select objects to measure:Cell, Cytoplasm, Nuclei
+    Run all metrics?:No
+    Calculate correlation and slope metrics?:Yes
+    Calculate the Manders coefficients?:Yes
+    Calculate the Rank Weighted Colocalization coefficients?:Yes
+    Calculate the Overlap coefficients?:Yes
+    Calculate the Manders coefficients using Costes auto threshold?:No
+    Method for Costes thresholding:Faster
+
+CalculateMoments:[module_num:74|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Calculate Kurtosis or spread of the mitochondria within a cell', '-Runs quickly, might as well run all of them lol']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Hidden:3
+    Hidden:1
+    Select an image to measure:RescaleIntensityMitoTracker
+    Select an image to measure:EnhancedMito
+    Select an image to measure:MitoTracker_MAX
+    Select objects to measure:Cell
+    Moments to compute:Mean,Standard Deviation,Skewness,Kurtosis
+
+CalculateMoments:[module_num:75|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Calculate Kurtosis or spread of the lysosomes within a cell  ', '- Might as well do everything lol']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Hidden:2
+    Hidden:1
+    Select an image to measure:RescaleIntensityLAMP1
+    Select an image to measure:LAMP1_MAX
+    Select objects to measure:Cell
+    Moments to compute:Mean,Standard Deviation,Skewness,Kurtosis
+
+RelateObjects:[module_num:76|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Relate filtered cells to the filtered nuclei objects (for the non-enforced set)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:Multinucleate_Cells
+    Child objects:AllNuclei
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:RelateObjects
+    Parent name:None
+
+RelateObjects:[module_num:77|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Calculate cell/nuc distances with relate objects']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Parent objects:Cell
+    Child objects:Nuclei
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:RelateObjects
+    Parent name:None
+
+RelateObjects:[module_num:78|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Relate lyso to cyto']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:Cell
+    Child objects:Lysosomes
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:Yes
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:Lysosomes_PerCell
+    Parent name:Nuclei
+
+RelateObjects:[module_num:79|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Relate mito to cyto']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:Cell
+    Child objects:Mitochondria
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:Yes
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:Mitochondria_PerCell
+    Parent name:Nuclei
+
+RelateObjects:[module_num:80|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Also for mitoends to get the mean  mitoends per cell']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:Cell
+    Child objects:MitoEnds
+    Calculate child-parent distances?:None
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:RelateObjects
+    Parent name:None
+
+DisplayDataOnImage:[module_num:81|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display object or image measurements?:Object
+    Select the input objects:Cell
+    Measurement to display:Mean_MitoEnds_ObjectSkeleton_NumberNonTrunkBranches_MitoSkeleton
+    Select the image on which to display the measurements:OutlinedMito
+    Text color:red
+    Name the output image that has the measurements displayed:MitoNuclearDistances
+    Font size (points):15
+    Number of decimals:2
+    Image elements to save:Image
+    Annotation offset (in pixels):0
+    Display mode:Text
+    Color map:Default
+    Display background image?:Yes
+    Color map scale:Use this image's measurement range
+    Color map range:0.0,1.0
+    Font:Liberation Sans
+    Use scientific notation?:No
+    Font weight:bold
+
+DisplayDataOnImage:[module_num:82|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display object or image measurements?:Object
+    Select the input objects:Cell
+    Measurement to display:Mean_Nuclei_ObjectSkeleton_NumberNonTrunkBranches_MitoSkeleton
+    Select the image on which to display the measurements:OutlinedMito
+    Text color:red
+    Name the output image that has the measurements displayed:MitoNuclearDistances
+    Font size (points):15
+    Number of decimals:2
+    Image elements to save:Image
+    Annotation offset (in pixels):0
+    Display mode:Text
+    Color map:Default
+    Display background image?:Yes
+    Color map scale:Use this image's measurement range
+    Color map range:0.0,1.0
+    Font:Liberation Sans
+    Use scientific notation?:No
+    Font weight:bold
+
+DisplayDataOnImage:[module_num:83|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display object or image measurements?:Object
+    Select the input objects:Nuclei
+    Measurement to display:ObjectSkeleton_NumberNonTrunkBranches_MitoSkeleton
+    Select the image on which to display the measurements:OutlinedMito
+    Text color:red
+    Name the output image that has the measurements displayed:MitoNuclearDistances
+    Font size (points):15
+    Number of decimals:2
+    Image elements to save:Image
+    Annotation offset (in pixels):0
+    Display mode:Text
+    Color map:Default
+    Display background image?:Yes
+    Color map scale:Use this image's measurement range
+    Color map range:0.0,1.0
+    Font:Liberation Sans
+    Use scientific notation?:No
+    Font weight:bold
+
+SaveImages:[module_num:84|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:OutlinedMito
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:MitoTracker_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:_Numbered
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Input Folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+SaveImages:[module_num:85|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:OutlinedLyso
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:LAMP1_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:_Numbered
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder sub-folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+SaveImages:[module_num:86|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Segmentation_Overlay
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:DAPI_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:_Numbered
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder sub-folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+ExportToDatabase:[module_num:87|svn_version:'Unknown'|variable_revision_number:28|show_window:False|notes:['Export to database - BE CAREFUL if making a cpanalyst properties file; it will shit the bed if there is a missing metadata']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Database type:SQLite
+    Database name:DefaultDB
+    Add a prefix to table names?:No
+    Table prefix:MyExpt_
+    Output file location:Default Output Folder|
+    Create a CellProfiler Analyst properties file?:No
+    Database host:
+    Username:
+    Password:
+    Name the SQLite database file:output.db
+    Calculate the per-image mean values of object measurements?:No
+    Calculate the per-image median values of object measurements?:No
+    Calculate the per-image standard deviation values of object measurements?:No
+    Calculate the per-well mean values of object measurements?:No
+    Calculate the per-well median values of object measurements?:No
+    Calculate the per-well standard deviation values of object measurements?:No
+    Export measurements for all objects to the database?:Select...
+    Select the objects:Cell,Cytoplasm,Nuclei
+    Maximum # of characters in a column name:64
+    Create one table per object, a single object table or a single object view?:One table per object type
+    Enter an image url prepend if you plan to access your files via http:
+    Write image thumbnails directly to the database?:No
+    Select the images for which you want to save thumbnails:
+    Auto-scale thumbnail pixel intensities?:Yes
+    Select the plate type:None
+    Select the plate metadata:None
+    Select the well metadata:None
+    Include information for all images, using default values?:Yes
+    Properties image group count:1
+    Properties group field count:1
+    Properties filter field count:0
+    Workspace measurement count:1
+    Experiment name:Morphology_ReplicativeAging_R5
+    Which objects should be used for locations?:None
+    Enter a phenotype class table name if using the Classifier tool in CellProfiler Analyst:
+    Export object relationships?:No
+    Overwrite without warning?:Data only
+    Access CellProfiler Analyst images via URL?:No
+    Select the classification type:Object
+    Select an image to include:None
+    Use the image name for the display?:Yes
+    Image name:Channel1
+    Channel color:red
+    Do you want to add group fields?:No
+    Enter the name of the group:
+    Enter the per-image columns which define the group, separated by commas:ImageNumber, Image_Metadata_Plate, Image_Metadata_Well
+    Do you want to add filter fields?:No
+    Automatically create a filter for each plate?:No
+    Create a CellProfiler Analyst workspace file?:No
+    Select the measurement display tool:ScatterPlot
+    Type of measurement to plot on the X-axis:Image
+    Enter the object name:None
+    Select the X-axis measurement:None
+    Select the X-axis index:ImageNumber
+    Type of measurement to plot on the Y-axis:Image
+    Enter the object name:None
+    Select the Y-axis measurement:None
+    Select the Y-axis index:ImageNumber
+
+ExportToDatabase:[module_num:88|svn_version:'Unknown'|variable_revision_number:28|show_window:False|notes:['Export the extra features ']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Database type:SQLite
+    Database name:DefaultDB
+    Add a prefix to table names?:No
+    Table prefix:MyExpt_
+    Output file location:Default Output Folder|
+    Create a CellProfiler Analyst properties file?:No
+    Database host:
+    Username:
+    Password:
+    Name the SQLite database file:extra_features.db
+    Calculate the per-image mean values of object measurements?:No
+    Calculate the per-image median values of object measurements?:No
+    Calculate the per-image standard deviation values of object measurements?:No
+    Calculate the per-well mean values of object measurements?:No
+    Calculate the per-well median values of object measurements?:No
+    Calculate the per-well standard deviation values of object measurements?:No
+    Export measurements for all objects to the database?:Select...
+    Select the objects:Lysosomes,MitoEnds,Mitochondria
+    Maximum # of characters in a column name:64
+    Create one table per object, a single object table or a single object view?:One table per object type
+    Enter an image url prepend if you plan to access your files via http:
+    Write image thumbnails directly to the database?:No
+    Select the images for which you want to save thumbnails:
+    Auto-scale thumbnail pixel intensities?:Yes
+    Select the plate type:None
+    Select the plate metadata:None
+    Select the well metadata:None
+    Include information for all images, using default values?:Yes
+    Properties image group count:1
+    Properties group field count:1
+    Properties filter field count:0
+    Workspace measurement count:1
+    Experiment name:Morphology_ReplicativeAging_R6
+    Which objects should be used for locations?:None
+    Enter a phenotype class table name if using the Classifier tool in CellProfiler Analyst:
+    Export object relationships?:No
+    Overwrite without warning?:Data only
+    Access CellProfiler Analyst images via URL?:No
+    Select the classification type:Object
+    Select an image to include:None
+    Use the image name for the display?:Yes
+    Image name:Channel1
+    Channel color:red
+    Do you want to add group fields?:No
+    Enter the name of the group:
+    Enter the per-image columns which define the group, separated by commas:ImageNumber, Image_Metadata_Plate, Image_Metadata_Well
+    Do you want to add filter fields?:No
+    Automatically create a filter for each plate?:No
+    Create a CellProfiler Analyst workspace file?:No
+    Select the measurement display tool:ScatterPlot
+    Type of measurement to plot on the X-axis:Image
+    Enter the object name:None
+    Select the X-axis measurement:None
+    Select the X-axis index:ImageNumber
+    Type of measurement to plot on the Y-axis:Image
+    Enter the object name:None
+    Select the Y-axis measurement:None
+    Select the Y-axis index:ImageNumber

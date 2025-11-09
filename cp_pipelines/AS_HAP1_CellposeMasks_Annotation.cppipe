@@ -1,0 +1,859 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:5
+DateRevision:428
+GitHash:
+ModuleCount:54
+HasImagePlaneDetails:False
+
+Images:[module_num:1|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:["Exclude the columns that don't have mitotractker/LAMP1"]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    :
+    Filter images?:Custom
+    Select the rule criteria:and (extension does istif)
+
+Metadata:[module_num:2|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['The Metadata module optionally allows you to extract information describing your images (i.e, metadata) which will be stored along with your measurements. This information can be contained in the file name and/or location, or in an external file.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Extract metadata?:Yes
+    Metadata data type:Text
+    Metadata types:{}
+    Extraction method count:2
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression to extract from file name:r(?P<WellRow>\d{2})c(?P<WellColumn>\d{2})f(?P<Field>\d{2})
+    Regular expression to extract from folder name:(?P<Date>[0-9]{4}_[0-9]{2}_[0-9]{2})$
+    Extract metadata from:All images
+    Select the filtering criteria:and (file does contain "")
+    Metadata file location:Elsewhere...|
+    Match file and image metadata:[]
+    Use case insensitive matching?:No
+    Metadata file name:None
+    Does cached metadata exist?:No
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression to extract from file name:ch(?P<Channels>\d{1})
+    Regular expression to extract from folder name:(?P<Date>[0-9]{4}_[0-9]{2}_[0-9]{2})$
+    Extract metadata from:Images matching a rule
+    Select the filtering criteria:and (file does contain "ch")
+    Metadata file location:Elsewhere...|
+    Match file and image metadata:[]
+    Use case insensitive matching?:No
+    Metadata file name:None
+    Does cached metadata exist?:No
+
+NamesAndTypes:[module_num:3|svn_version:'Unknown'|variable_revision_number:8|show_window:False|notes:['The NamesAndTypes module allows you to assign a meaningful name to each image by which other modules will refer to it.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Assign a name to:Images matching rules
+    Select the image type:Grayscale image
+    Name to assign these images:DNA
+    Match metadata:[{'Cell_Masks': 'Well', 'DAPI_MAX': 'Well', 'Nuclei_Masks': 'Well', 'Alexa488_MAX': 'Well', 'Alexa594_MAX': 'Well', 'WGA_MAX': 'Well'}, {'Cell_Masks': 'WellRow', 'DAPI_MAX': 'WellRow', 'Nuclei_Masks': 'WellRow', 'Alexa488_MAX': 'WellRow', 'Alexa594_MAX': 'WellRow', 'WGA_MAX': 'WellRow'}, {'Cell_Masks': 'WellColumn', 'DAPI_MAX': 'WellColumn', 'Nuclei_Masks': 'WellColumn', 'Alexa488_MAX': 'WellColumn', 'Alexa594_MAX': 'WellColumn', 'WGA_MAX': 'WellColumn'}, {'Cell_Masks': 'Field', 'DAPI_MAX': 'Field', 'Nuclei_Masks': 'Field', 'Alexa488_MAX': 'Field', 'Alexa594_MAX': 'Field', 'WGA_MAX': 'Field'}]
+    Image set matching method:Metadata
+    Set intensity range from:Image metadata
+    Assignments count:6
+    Single images count:0
+    Maximum intensity:4294967295
+    Process as 3D?:No
+    Relative pixel spacing in X:1.0
+    Relative pixel spacing in Y:1.0
+    Relative pixel spacing in Z:1.0
+    Select the rule criteria:and (metadata does Channels "3") (file does contain "MAX")
+    Name to assign these images:DAPI_MAX
+    Name to assign these objects:Cell
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (metadata does Channels "1") (file does contain "MAX")
+    Name to assign these images:Alexa488_MAX
+    Name to assign these objects:Nucleus
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (metadata does Channels "2") (file does contain "MAX")
+    Name to assign these images:Alexa594_MAX
+    Name to assign these objects:Cytoplasm
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (file does contain "cell") (file does contain "masks") (extension does istif)
+    Name to assign these images:Cell_Masks
+    Name to assign these objects:Cell_Masks
+    Select the image type:Objects
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (file does contain "nuclei") (file does contain "masks")
+    Name to assign these images:DNA
+    Name to assign these objects:Nuclei_Masks
+    Select the image type:Objects
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (metadata does Channels "4") (file does contain "MAX")
+    Name to assign these images:WGA_MAX
+    Name to assign these objects:Object1
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+
+Groups:[module_num:4|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['The Groups module optionally allows you to split your list of images into image subsets (groups) which will be processed independently of each other. Examples of groupings include screening batches, microtiter plates, time-lapse movies, etc.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Do you want to group your images?:No
+    grouping metadata count:1
+    Metadata category:None
+
+CorrectIlluminationCalculate:[module_num:5|svn_version:'Unknown'|variable_revision_number:2|show_window:True|notes:['Correct mitotracker bg intensity']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:Alexa488_MAX
+    Name the output image:Illum_Green
+    Select how the illumination function is calculated:Background
+    Dilate objects in the final averaged image?:No
+    Dilation radius:1
+    Block size:20
+    Rescale the illumination function?:No
+    Calculate function for each image individually, or based on all images?:Each
+    Smoothing method:Gaussian Filter
+    Method to calculate smoothing filter size:Manually
+    Approximate object diameter:10
+    Smoothing filter size:20
+    Retain the averaged image?:No
+    Name the averaged image:IllumBlueAvg
+    Retain the dilated image?:No
+    Name the dilated image:IllumBlueDilated
+    Automatically calculate spline parameters?:No
+    Background mode:dark
+    Number of spline points:5
+    Background threshold:2.0
+    Image resampling factor:2.0
+    Maximum number of iterations:40
+    Residual value for convergence:0.001
+
+CorrectIlluminationCalculate:[module_num:6|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Correct LAMP1 background intensity']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:Alexa594_MAX
+    Name the output image:Illum_Red
+    Select how the illumination function is calculated:Background
+    Dilate objects in the final averaged image?:No
+    Dilation radius:1
+    Block size:20
+    Rescale the illumination function?:No
+    Calculate function for each image individually, or based on all images?:Each
+    Smoothing method:Gaussian Filter
+    Method to calculate smoothing filter size:Manually
+    Approximate object diameter:10
+    Smoothing filter size:30
+    Retain the averaged image?:No
+    Name the averaged image:IllumBlueAvg
+    Retain the dilated image?:No
+    Name the dilated image:IllumBlueDilated
+    Automatically calculate spline parameters?:Yes
+    Background mode:auto
+    Number of spline points:5
+    Background threshold:2.0
+    Image resampling factor:2.0
+    Maximum number of iterations:40
+    Residual value for convergence:0.001
+
+CorrectIlluminationApply:[module_num:7|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Apply bg subtraction functions']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:Alexa488_MAX
+    Name the output image:CorrGreen_MAX
+    Select the illumination function:Illum_Green
+    Select how the illumination function is applied:Subtract
+    Select the input image:Alexa594_MAX
+    Name the output image:CorrRed_MAX
+    Select the illumination function:Illum_Red
+    Select how the illumination function is applied:Subtract
+    Set output image values less than 0 equal to 0?:Yes
+    Set output image values greater than 1 equal to 1?:Yes
+
+ErodeObjects:[module_num:8|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['First part of an opeining']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:Cell_Masks
+    Name the output object:ErodeCellMasks
+    Structuring element:Disk,2
+    Prevent object removal:Yes
+    Relabel resulting objects:No
+
+ErodeObjects:[module_num:9|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['erode by the same amount dilated in cellpose (step to remove stragglers almost touching the edge)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:Nuclei_Masks
+    Name the output object:ErodeNucMasks
+    Structuring element:disk,1
+    Prevent object removal:Yes
+    Relabel resulting objects:No
+
+DilateObjects:[module_num:10|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['second part of an opening - keep the structuring element the same as previous']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:ErodeCellMasks
+    Name the output object:DilateCellMasks
+    Structuring element:Disk,2
+
+ResizeObjects:[module_num:11|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:DilateCellMasks
+    Name the output object:ResizeCellMasks
+    Method:Match Image
+    X Factor:2
+    Y Factor:2
+    Z Factor:0.25
+    Width (X):100
+    Height (Y):100
+    Planes (Z):10
+    Select the image with the desired dimensions:DAPI_MAX
+
+ResizeObjects:[module_num:12|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Resize nuclear masks']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input object:ErodeNucMasks
+    Name the output object:ResizeNucleiMasks
+    Method:Match Image
+    X Factor:2
+    Y Factor:2
+    Z Factor:0.25
+    Width (X):100
+    Height (Y):100
+    Planes (Z):10
+    Select the image with the desired dimensions:DAPI_MAX
+
+FilterObjects:[module_num:13|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Filter to remove any more nuclei touching borders']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:ResizeNucleiMasks
+    Name the output objects:OrigFilteredNuclei
+    Select the filtering mode:Image or mask border
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:None
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:RemovedObjects
+    Select the measurement to filter by:AreaShape_Area
+    Filter using a minimum measurement value?:Yes
+    Minimum value:0.0
+    Filter using a maximum measurement value?:Yes
+    Maximum value:1.0
+    Allow fuzzy feature matching?:No
+
+RelateObjects:[module_num:14|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Relate nuclei to the orignal cell objects and save the nuclei that belong to these cells', '']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:ResizeCellMasks
+    Child objects:OrigFilteredNuclei
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:Yes
+    Name the output object:AllNuclei
+    Parent name:None
+
+FilterObjects:[module_num:15|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Filter cells out without nuclei or with multiple nuclei (positively) - in case I want to analyze these filtered-out cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:ResizeCellMasks
+    Name the output objects:ValidCells
+    Select the filtering mode:Measurements
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:Cell_Masks
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:NotRemovedCells
+    Select the measurement to filter by:Children_OrigFilteredNuclei_Count
+    Filter using a minimum measurement value?:Yes
+    Minimum value:1
+    Filter using a maximum measurement value?:No
+    Maximum value:2
+    Allow fuzzy feature matching?:No
+
+FilterObjects:[module_num:16|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Multinuc cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:ResizeCellMasks
+    Name the output objects:Multinucleate_Cells
+    Select the filtering mode:Measurements
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:Cell_Masks
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Keep removed objects as a separate set?:No
+    Name the objects removed by the filter:NotRemovedCells
+    Select the measurement to filter by:Children_OrigFilteredNuclei_Count
+    Filter using a minimum measurement value?:Yes
+    Minimum value:2
+    Filter using a maximum measurement value?:No
+    Maximum value:2
+    Allow fuzzy feature matching?:No
+
+FlagImage:[module_num:17|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Flag an image to remove images with no cells, no nuclei, or a tiny amount of cell area', 'Stops crashes when going to overlay objects']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Hidden:2
+    Hidden:1
+    Name the flag's category:Metadata
+    Name the flag:EmptyImage_Cells
+    How should measurements be linked?:Flag if any fail
+    Skip image set if flagged?:Yes
+    Flag is based on:Whole-image measurement
+    Select the object to be used for flagging:Cell
+    Which measurement?:Count_ResizeCellMasks
+    Flag images based on low values?:Yes
+    Minimum value:1.0
+    Flag images based on high values?:No
+    Maximum value:1.0
+    Rules file location:Elsewhere...|
+    Rules file name:rules.txt
+    Class number:
+    Allow fuzzy feature matching?:No
+    Hidden:1
+    Name the flag's category:Metadata
+    Name the flag:EmptyImage_Nuclei
+    How should measurements be linked?:Flag if any fail
+    Skip image set if flagged?:Yes
+    Flag is based on:Whole-image measurement
+    Select the object to be used for flagging:None
+    Which measurement?:Count_AllNuclei
+    Flag images based on low values?:Yes
+    Minimum value:1.0
+    Flag images based on high values?:No
+    Maximum value:1.0
+    Rules file location:Elsewhere...|
+    Rules file name:rules.txt
+    Class number:
+    Allow fuzzy feature matching?:No
+    Ignore flag skips on last cycle?:No
+
+Smooth:[module_num:18|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:DAPI_MAX
+    Name the output image:SmoothNuc
+    Select smoothing method:Median Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:10
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:No
+
+OverlayObjects:[module_num:19|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Input:DAPI_MAX
+    Name the output image:OverlayObjects
+    Objects:AllCells
+    Opacity:0.3
+
+HistogramEqualization:[module_num:20|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Equalize to enhance brighness for display']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:DAPI_MAX
+    Name the output image:EqualizationDAPI
+    Bins:256
+    Mask:Leave blank
+    Local:Yes
+    Tile Size:150
+    Clip limit:0.01
+    Is your image 3D?:No
+    Do framewise calculation?:No
+    Tile Size (Z):5
+
+HistogramEqualization:[module_num:21|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Also scale wga']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:WGA_MAX
+    Name the output image:EqualizationWGA
+    Bins:256
+    Mask:Leave blank
+    Local:Yes
+    Tile Size:100
+    Clip limit:0.03
+    Is your image 3D?:No
+    Do framewise calculation?:No
+    Tile Size (Z):5
+
+HistogramEqualization:[module_num:22|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Alexa594_MAX
+    Name the output image:EqualizationMitoConA
+    Bins:256
+    Mask:Leave blank
+    Local:Yes
+    Tile Size:100
+    Clip limit:0.02
+    Is your image 3D?:No
+    Do framewise calculation?:No
+    Tile Size (Z):5
+
+HistogramEqualization:[module_num:23|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Alexa488_MAX
+    Name the output image:EqualizationGreen
+    Bins:256
+    Mask:Leave blank
+    Local:Yes
+    Tile Size:100
+    Clip limit:0.02
+    Is your image 3D?:No
+    Do framewise calculation?:No
+    Tile Size (Z):5
+
+Smooth:[module_num:24|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Smooth the compsosite']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:ImageAfterMath
+    Name the output image:SmoothCellOutline
+    Select smoothing method:Median Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:2
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:Yes
+
+ExpandOrShrinkObjects:[module_num:25|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:AllNuclei
+    Name the output objects:ShrunkenNuclei
+    Select the operation:Shrink objects by a specified number of pixels
+    Number of pixels by which to expand or shrink:2
+    Fill holes in objects so that all objects shrink to a single point?:No
+    Expand or shrink measurement:None
+
+EnforceObjectsOneToOne:[module_num:26|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Force cell and nuclei to be 1:1 to handle the cases where there are multiple nuclei / nuclei overlapping out of bounds. This will be the final cell/nuclei object set for our purposes']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Pre-primary objects:ShrunkenNuclei
+    Pre-secondary objects:ValidCells
+    Name the output primary object:Nuclei
+    Name the output secondary object:Cell
+    In module display, show enforced objects on a selected image?:Yes
+    Select the image for visualization:DAPI_MAX
+
+OverlayOutlines:[module_num:27|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Same as above but on a blank image to use for later if need be']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationDAPI
+    Name the output image:Segmentation_Overlay_DAPI
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#3DE3E3
+    Select objects to display:Nuclei
+    Select outline color:#29E33D
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:28|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationWGA
+    Name the output image:Segmentation_Overlay_WGA
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#3DE3E3
+    Select objects to display:Nuclei
+    Select outline color:#29E33D
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:29|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationGreen
+    Name the output image:Segmentation_Overlay_Green
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#3DE3E3
+    Select objects to display:Nuclei
+    Select outline color:#29E33D
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:30|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationMitoConA
+    Name the output image:Segmentation_Overlay_MitoConA
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#3DE3E3
+    Select objects to display:Nuclei
+    Select outline color:#29E33D
+    Select objects to display:Cell
+
+IdentifyPrimaryObjects:[module_num:31|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Find lyso puncta']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:MaskLAMP1Puncta
+    Name the primary objects to be identified:LysosomePuncta
+    Typical diameter of objects, in pixel units (Min,Max):3,50
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Intensity
+    Method to draw dividing lines between clumped objects:Propagate
+    Size of smoothing filter:2
+    Suppress local maxima that are closer than this minimum allowed distance:3
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After declumping only
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Robust Background
+    Threshold smoothing scale:0
+    Threshold correction factor:0.8
+    Lower and upper bounds on threshold:0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:30
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2
+    Thresholding method:Robust Background
+
+Smooth:[module_num:32|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Smooth the lysososomes themselves']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:EqualizationLAMP1
+    Name the output image:SmoothEqualizedLAMP1
+    Select smoothing method:Gaussian Filter
+    Calculate artifact diameter automatically?:No
+    Typical artifact diameter:2
+    Edge intensity difference:0.1
+    Clip intensities to 0 and 1?:Yes
+
+MaskImage:[module_num:33|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Mask the smoothed original lamp1 image']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:SmoothEqualizedLAMP1
+    Name the output image:MaskSmoothEqualizedLAMP1
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+IdentifySecondaryObjects:[module_num:34|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['Expand the lysosomes by propagation using puncta as seeds; not 100% accurate but it its what it is']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input objects:LysosomePuncta
+    Name the objects to be identified:UnfilteredLysosomes
+    Select the method to identify the secondary objects:Propagation
+    Select the input image:MaskSmoothEqualizedLAMP1
+    Number of pixels by which to expand the primary objects:10
+    Regularization factor:3
+    Discard secondary objects touching the border of the image?:No
+    Discard the associated primary objects?:No
+    Name the new primary objects:FilteredNuclei
+    Fill holes in identified objects?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:0.0
+    Threshold correction factor:1.5
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Three classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+IdentifyPrimaryObjects:[module_num:35|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['An attempt at finding the big lysosomes and adding to the set - future maybe']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:SmoothEqualizedLAMP1
+    Name the primary objects to be identified:BigLysosome
+    Typical diameter of objects, in pixel units (Min,Max):10,90
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Intensity
+    Size of smoothing filter:2
+    Suppress local maxima that are closer than this minimum allowed distance:4
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:Yes
+    Automatically calculate minimum allowed distance between local maxima?:Yes
+    Handling of objects if excessive number of objects identified:Erase
+    Maximum number of objects:20000
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:0
+    Threshold correction factor:1.5
+    Lower and upper bounds on threshold:0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:30
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+EnhanceOrSuppressFeatures:[module_num:36|svn_version:'Unknown'|variable_revision_number:7|show_window:False|notes:['Now enhance the neurites - but on the illum corrected image, not the equalization image to avoid amplifying bg']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:CorrMitoTracker_MAX
+    Name the output image:EnhancedMito
+    Select the operation:Enhance
+    Feature size:10
+    Feature type:Neurites
+    Range of hole sizes:1,10
+    Smoothing scale:1
+    Shear angle:0.0
+    Decay:0.95
+    Enhancement method:Tubeness
+    Speed and accuracy:Fast
+    Rescale result image:Yes
+
+MaskImage:[module_num:37|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Mask Mitotracker enhanced img to only identify objects within cells']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:EnhancedMito
+    Name the output image:MaskedNeuritesMitoTracker
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+MaskImage:[module_num:38|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:EqualizationMito
+    Name the output image:MaskedEqualizationMitoTracker
+    Use objects or an image as a mask?:Objects
+    Select object for mask:Cell
+    Select image for mask:None
+    Invert the mask?:No
+
+OverlayOutlines:[module_num:39|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Image for lyso/nuc outlines on lyso image']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationLAMP1
+    Name the output image:OutlinedLyso
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#59CF66
+    Select objects to display:Nuclei
+    Select outline color:#FF7D89
+    Select objects to display:Lysosomes
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:40|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Show cell/nuc/mito outlines on cell image']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationMito
+    Name the output image:OutlinedMito
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#59CF66
+    Select objects to display:Nuclei
+    Select outline color:#FF7D89
+    Select objects to display:Mitochondria
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+OverlayOutlines:[module_num:41|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:EqualizationMito
+    Name the output image:OutlinedMito
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Thick
+    Select outline color:#59CF66
+    Select objects to display:Nuclei
+    Select outline color:#FF7D89
+    Select objects to display:Mitochondria_Puncta
+    Select outline color:#59CF66
+    Select objects to display:Cell
+
+RelateObjects:[module_num:42|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Relate filtered cells to the filtered nuclei objects (for the non-enforced set)']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Parent objects:Multinucleate_Cells
+    Child objects:AllNuclei
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:RelateObjects
+    Parent name:None
+
+RelateObjects:[module_num:43|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Calculate cell/nuc distances with relate objects']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Parent objects:Cell
+    Child objects:Nuclei
+    Calculate child-parent distances?:Both
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:RelateObjects
+    Parent name:None
+
+DisplayDataOnImage:[module_num:44|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display object or image measurements?:Object
+    Select the input objects:Cell
+    Measurement to display:Number_Object_Number
+    Select the image on which to display the measurements:Segmentation_Overlay_DAPI
+    Text color:#D3555C
+    Name the output image that has the measurements displayed:Cell_ObjectNumbers_OnDAPI
+    Font size (points):25
+    Number of decimals:0
+    Image elements to save:Image
+    Annotation offset (in pixels):0
+    Display mode:Text
+    Color map:Default
+    Display background image?:Yes
+    Color map scale:Use this image's measurement range
+    Color map range:0.0,1.0
+    Font:Liberation Sans
+    Use scientific notation?:No
+    Font weight:bold
+
+DisplayDataOnImage:[module_num:45|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display object or image measurements?:Object
+    Select the input objects:Cell
+    Measurement to display:Number_Object_Number
+    Select the image on which to display the measurements:Segmentation_Overlay_WGA
+    Text color:#D3555C
+    Name the output image that has the measurements displayed:Cell_ObjectNumbers_OnWGA
+    Font size (points):25
+    Number of decimals:0
+    Image elements to save:Image
+    Annotation offset (in pixels):0
+    Display mode:Text
+    Color map:Default
+    Display background image?:Yes
+    Color map scale:Use this image's measurement range
+    Color map range:0.0,1.0
+    Font:Liberation Sans
+    Use scientific notation?:No
+    Font weight:bold
+
+SaveImages:[module_num:46|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Cell_ObjectNumbers_OnDAPI
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:DAPI_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:_ObjectNumbers
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+SaveImages:[module_num:47|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Cell_ObjectNumbers_OnWGA
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:WGA_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:_ObjectNumbers
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+SaveImages:[module_num:48|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Segmentation_Overlay_MitoConA
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:Alexa594_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:_ObjectNumbers
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+SaveImages:[module_num:49|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Segmentation_Overlay_Green
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:Alexa488_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:_ObjectNumbers
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+SaveImages:[module_num:50|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Segmentation_Overlay_Green
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:Alexa488_MAX
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:_Numbered
+    Saved file format:png
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Default Output Folder sub-folder|
+    How to save the series:T (Time)
+    Save with lossless compression?:Yes
+
+MeasureObjectSizeShape:[module_num:51|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:True]
+    Select object sets to measure:Cell, Nuclei
+    Calculate the Zernike features?:No
+    Calculate the advanced features?:No
+
+ExportToSpreadsheet:[module_num:52|svn_version:'Unknown'|variable_revision_number:13|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:No
+    Add image file and folder names to your object data file?:No
+    Select the measurements to export:Yes
+    Calculate the per-image mean values for object measurements?:No
+    Calculate the per-image median values for object measurements?:No
+    Calculate the per-image standard deviation values for object measurements?:No
+    Output file location:Default Output Folder|
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Metadata
+    Select the image to use as the identifier:None
+    Select the metadata to use as the identifier:None
+    Export all measurement types?:Yes
+    Press button to select measurements:
+    Representation of Nan/Inf:NaN
+    Add a prefix to file names?:Yes
+    Filename prefix:Annotating_
+    Overwrite existing files without warning?:Yes
+    Data to export:Do not use
+    Combine these object measurements with those of the previous object?:No
+    File name:DATA.csv
+    Use the object name for the file name?:Yes
+
+ExportToSpreadsheet:[module_num:53|svn_version:'Unknown'|variable_revision_number:13|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:Yes
+    Add image file and folder names to your object data file?:Yes
+    Select the measurements to export:Yes
+    Calculate the per-image mean values for object measurements?:No
+    Calculate the per-image median values for object measurements?:No
+    Calculate the per-image standard deviation values for object measurements?:No
+    Output file location:Default Output Folder|
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Metadata
+    Select the image to use as the identifier:None
+    Select the metadata to use as the identifier:None
+    Export all measurement types?:Yes
+    Press button to select measurements:Image|Width_Nuclei_Masks,Image|Width_Alexa594_MAX,Image|Width_WGA_MAX,Image|Width_Cell_Masks,Image|Width_DAPI_MAX,Image|Width_Alexa488_MAX,Image|Scaling_Alexa488_MAX,Image|Scaling_DAPI_MAX,Image|Scaling_WGA_MAX,Image|Scaling_Alexa594_MAX,Image|Count_Nuclei,Image|Count_Nuclei_Masks,Image|Count_ShrunkenNuclei,Image|Count_Cell,Image|Count_Cell_Masks,Image|Count_Multinucleate_Cells,Image|Count_OrigFilteredNuclei,Image|Count_ResizeCellMasks,Image|Count_AllNuclei,Image|Count_ErodeCellMasks,Image|Count_ErodeNucMasks,Image|Count_ResizeNucleiMasks,Image|Count_DilateCellMasks,Image|Count_ValidCells,Image|ModuleError_29OverlayOutlines,Image|ModuleError_12ResizeObjects,Image|ModuleError_11ResizeObjects,Image|ModuleError_08ErodeObjects,Image|ModuleError_26EnforceObjectsOneToOne,Image|ModuleError_22HistogramEqualization,Image|ModuleError_30OverlayOutlines,Image|ModuleError_04Groups,Image|ModuleError_25ExpandOrShrinkObjects,Image|ModuleError_51MeasureObjectSizeShape,Image|ModuleError_03NamesAndTypes,Image|ModuleError_45DisplayDataOnImage,Image|ModuleError_46SaveImages,Image|ModuleError_20HistogramEqualization,Image|ModuleError_23HistogramEqualization,Image|ModuleError_48SaveImages,Image|ModuleError_17FlagImage,Image|ModuleError_10DilateObjects,Image|ModuleError_44DisplayDataOnImage,Image|ModuleError_01Images,Image|ModuleError_16FilterObjects,Image|ModuleError_15FilterObjects,Image|ModuleError_47SaveImages,Image|ModuleError_27OverlayOutlines,Image|ModuleError_13FilterObjects,Image|ModuleError_49SaveImages,Image|ModuleError_14RelateObjects,Image|ModuleError_09ErodeObjects,Image|ModuleError_21HistogramEqualization,Image|ModuleError_02Metadata,Image|ModuleError_28OverlayOutlines,Image|ExecutionTime_15FilterObjects,Image|ExecutionTime_17FlagImage,Image|ExecutionTime_47SaveImages,Image|ExecutionTime_21HistogramEqualization,Image|ExecutionTime_28OverlayOutlines,Image|ExecutionTime_48SaveImages,Image|ExecutionTime_27OverlayOutlines,Image|ExecutionTime_29OverlayOutlines,Image|ExecutionTime_02Metadata,Image|ExecutionTime_01Images,Image|ExecutionTime_51MeasureObjectSizeShape,Image|ExecutionTime_30OverlayOutlines,Image|ExecutionTime_20HistogramEqualization,Image|ExecutionTime_26EnforceObjectsOneToOne,Image|ExecutionTime_09ErodeObjects,Image|ExecutionTime_16FilterObjects,Image|ExecutionTime_10DilateObjects,Image|ExecutionTime_12ResizeObjects,Image|ExecutionTime_14RelateObjects,Image|ExecutionTime_23HistogramEqualization,Image|ExecutionTime_25ExpandOrShrinkObjects,Image|ExecutionTime_13FilterObjects,Image|ExecutionTime_49SaveImages,Image|ExecutionTime_22HistogramEqualization,Image|ExecutionTime_11ResizeObjects,Image|ExecutionTime_04Groups,Image|ExecutionTime_46SaveImages,Image|ExecutionTime_45DisplayDataOnImage,Image|ExecutionTime_03NamesAndTypes,Image|ExecutionTime_44DisplayDataOnImage,Image|ExecutionTime_08ErodeObjects,Image|FileName_Alexa488_MAX,Image|FileName_Alexa594_MAX,Image|FileName_WGA_MAX,Image|FileName_DAPI_MAX,Image|Series_Alexa488_MAX,Image|Series_DAPI_MAX,Image|Series_Alexa594_MAX,Image|Series_WGA_MAX,Image|Metadata_Channels,Image|Metadata_Field,Image|Metadata_WellRow,Image|Metadata_Series,Image|Metadata_Frame,Image|Metadata_Well,Image|Metadata_EmptyImage_Nuclei,Image|Metadata_EmptyImage_Cells,Image|Metadata_FileLocation,Image|Metadata_WellColumn,Image|MD5Digest_WGA_MAX,Image|MD5Digest_Cell_Masks,Image|MD5Digest_Alexa488_MAX,Image|MD5Digest_Alexa594_MAX,Image|MD5Digest_Nuclei_Masks,Image|MD5Digest_DAPI_MAX,Image|Group_Index,Image|Group_Number,Image|Group_Length,Image|Frame_DAPI_MAX,Image|Frame_Alexa488_MAX,Image|Frame_WGA_MAX,Image|Frame_Alexa594_MAX,Image|ObjectsPathName_Cell_Masks,Image|ObjectsPathName_Nuclei_Masks,Image|ObjectsSeries_Nuclei_Masks,Image|ObjectsSeries_Cell_Masks,Image|Height_WGA_MAX,Image|Height_Alexa594_MAX,Image|Height_Nuclei_Masks,Image|Height_Alexa488_MAX,Image|Height_DAPI_MAX,Image|Height_Cell_Masks,Image|ObjectsFrame_Nuclei_Masks,Image|ObjectsFrame_Cell_Masks,Image|ObjectsURL_Nuclei_Masks,Image|ObjectsURL_Cell_Masks,Image|URL_DAPI_MAX,Image|URL_Alexa488_MAX,Image|URL_Alexa594_MAX,Image|URL_WGA_MAX,Image|PathName_DAPI_MAX,Image|PathName_Alexa488_MAX,Image|PathName_Alexa594_MAX,Image|PathName_WGA_MAX,Image|ObjectsFileName_Nuclei_Masks,Image|ObjectsFileName_Cell_Masks,Cell|AreaShape_EulerNumber,Cell|AreaShape_Center_Y,Cell|AreaShape_Center_X,Cell|AreaShape_BoundingBoxArea,Cell|AreaShape_MinorAxisLength,Cell|AreaShape_Area,Cell|AreaShape_Orientation,Cell|AreaShape_BoundingBoxMaximum_Y,Cell|AreaShape_BoundingBoxMaximum_X,Cell|AreaShape_FormFactor,Cell|AreaShape_BoundingBoxMinimum_Y,Cell|AreaShape_BoundingBoxMinimum_X,Cell|AreaShape_MeanRadius,Cell|AreaShape_EquivalentDiameter,Cell|AreaShape_MaxFeretDiameter,Cell|AreaShape_MajorAxisLength,Cell|AreaShape_Extent,Cell|AreaShape_MaximumRadius,Cell|AreaShape_MedianRadius,Cell|AreaShape_Perimeter,Cell|AreaShape_MinFeretDiameter,Cell|AreaShape_Solidity,Cell|AreaShape_Eccentricity,Cell|AreaShape_ConvexArea,Cell|AreaShape_Compactness,Cell|Location_Center_Y,Cell|Location_Center_X,Cell|Location_Center_Z,Cell|Number_Object_Number,Cell|Parent_Nuclei,Cell|Parent_ValidCells,Nuclei|AreaShape_FormFactor,Nuclei|AreaShape_MeanRadius,Nuclei|AreaShape_BoundingBoxMinimum_Y,Nuclei|AreaShape_BoundingBoxMinimum_X,Nuclei|AreaShape_Center_X,Nuclei|AreaShape_Center_Y,Nuclei|AreaShape_Eccentricity,Nuclei|AreaShape_BoundingBoxMaximum_Y,Nuclei|AreaShape_BoundingBoxMaximum_X,Nuclei|AreaShape_MedianRadius,Nuclei|AreaShape_MaxFeretDiameter,Nuclei|AreaShape_Area,Nuclei|AreaShape_Solidity,Nuclei|AreaShape_MaximumRadius,Nuclei|AreaShape_MajorAxisLength,Nuclei|AreaShape_Perimeter,Nuclei|AreaShape_MinorAxisLength,Nuclei|AreaShape_EulerNumber,Nuclei|AreaShape_ConvexArea,Nuclei|AreaShape_BoundingBoxArea,Nuclei|AreaShape_Compactness,Nuclei|AreaShape_EquivalentDiameter,Nuclei|AreaShape_MinFeretDiameter,Nuclei|AreaShape_Orientation,Nuclei|AreaShape_Extent,Nuclei|Location_Center_Y,Nuclei|Location_Center_Z,Nuclei|Location_Center_X,Nuclei|Parent_ShrunkenNuclei,Nuclei|Children_Cell_Count,Nuclei|Number_Object_Number,Experiment|CellProfiler_Version,Experiment|Modification_Timestamp,Experiment|Pipeline_Pipeline,Experiment|Run_Timestamp
+    Representation of Nan/Inf:NaN
+    Add a prefix to file names?:Yes
+    Filename prefix:HAP1_B5_
+    Overwrite existing files without warning?:Yes
+    Data to export:Do not use
+    Combine these object measurements with those of the previous object?:No
+    File name:DATA.csv
+    Use the object name for the file name?:Yes
+
+SaveCroppedObjects:[module_num:54|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Do you want to save cropped images or object masks?:Images
+    Objects:Nuclei
+    Directory:Default Output Folder
+    Prefix saved crop image name with input image name?:Yes
+    Select image name to use as a prefix:None
+    Save output crops in nested folders?:No
+    Saved file format:8-bit tiff
+    Image to crop:None
