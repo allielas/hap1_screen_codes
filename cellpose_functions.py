@@ -45,6 +45,20 @@ def plate_location(filename):
     return location
 
 
+def find_row_col_field_string(img_set_name):
+    import re
+
+    rowcol_pattern = r"r(\d{1,2})c(\d{1,2})f(\d{1,2})"  # Matches "RX" where X is the replicate number (placeholder for now)
+    match = re.search(rowcol_pattern, img_set_name)
+    if match:
+        row_metadata = int(match.group(1))
+        col_metadata = int(match.group(2))
+        field_metadata = int(match.group(3))
+        return f"r{str(row_metadata).rjust(2, '0')}c{str(col_metadata).rjust(2, '0')}f{str(field_metadata).rjust(2, '0')}"
+    else:
+        return ""
+
+
 def sort_files(dir, image_ext):
     """
     Sort the list of directories sorted by their plate location and channel
@@ -69,6 +83,32 @@ def sort_files(dir, image_ext):
         raise FileNotFoundError(
             "no image files found, did you specify the correct folder and extension?"
         )
+    else:
+        return files
+
+
+def load_mask_list(dir, image_ext=".tif"):
+    """
+    Sort the list of masks
+    Parameters:
+          dir (Path object or str): the directory containing the images
+          image_ext (str, optional): the image extension, tif by default
+    Returns:
+          files (list of Path objects): the list of files sorted by location and channel
+    """
+    if not dir.exists():
+        raise FileNotFoundError("directory does not exist")
+    try:
+        files = [
+            f
+            for f in dir.glob("*" + image_ext)
+            if "_masks" in f.name and "_flows" not in f.name and "SUM" not in f.name
+        ]
+    except IndexError as e:
+        print(f"{e}, empty list, returning []")
+        return []
+    if len(files) == 0:
+        return []
     else:
         return files
 
@@ -143,7 +183,7 @@ def print_grouped_files(grouped_files_by_channel):
             print(" " + item.name)
 
 
-def load_image_set(single_grouped_files_by_channel, nchannels=None):
+def load_image_set_hap1(single_grouped_files_by_channel, nchannels=None):
     """
     Load an image set given file paths for a single image set; load images from a single element of the list made by the `group_files_by_channel` function
     Parameters:
@@ -155,28 +195,61 @@ def load_image_set(single_grouped_files_by_channel, nchannels=None):
     if nchannels == None:
         nchannels = len(single_grouped_files_by_channel)
     # load the images from the channels - skip ch3 at position 2 as DAPI is always the last channel
-    lastindex = nchannels - 1  # subtract 1 to convert to the 0-index
-    ch1, ch2, ch3 = (
-        io.imread(single_grouped_files_by_channel[0]),
-        io.imread(single_grouped_files_by_channel[1]),
-        io.imread(single_grouped_files_by_channel[lastindex]),
-    )
-    image_set = [ch1, ch2 * 2, ch3]
+
+    image_set = []
+    for i in range(nchannels):
+        image_channel = io.imread(single_grouped_files_by_channel[i])
+        image_set.append(image_channel)
     return image_set
 
 
-def get_image_set_name(grouped_files_by_channel, index=1):
+def img_preprocessing_hap1(
+    img_set, selected_channels=[1, 2, 3, 4], nucleus_channel=3, mode="retain"
+):
     """
-    Get the name of the image set from the specified index in a list of filenames grouped by channel
-    Corresponds to image set index in cellprofiler based on the order in the folder
+    Preprocess a grayscale image given an list of single-channel grayscale images with historam equalization, and median filter smoothing and stack the image together
     Parameters:
-          grouped_files_by_channel (2D list of Path objects): an ordered 2D list of file paths grouped by channel and ordered by platemap location
-          index (int, optional): the index to look up the rowcolfield of that image set
+           img_set (list of 2D arrays): a list of 2D arrays representing grayscale images
+           selected channels (list of int): a list with the desiered channels to use/process (1-indexed)
+           mode (str, "retain" or "remove): whether to keep the other channels downstream or discard them
     Returns:
-          set_name (str): String name of the image set from the rowcolfield filename nomenclature
+          multi_channel_image (3D array): a 3D array containing the preprocessed grayscale images
     """
-    set_name = plate_location(grouped_files_by_channel[index - 1].name)
-    return set_name
+    from skimage import exposure, filters, morphology
+
+    # ch1,ch2,ch3 = io.imread(files[0]), io.imread(files[1]), io.imread(files[3])
+    # channels = [ch1, ch2, ch3]
+    img_stack = []
+    if mode == "retain":
+        for i, channel in enumerate(img_set):
+            if i + 1 in selected_channels:
+                # footprint = morphology.disk(5)
+                channel = img_01_normalization(channel)
+                # don't apply histogram equalization to nuc; will bring out background too much
+                if i + 1 != nucleus_channel:
+                    channel = exposure.equalize_adapthist(
+                        channel, kernel_size=100, clip_limit=0.01
+                    )
+                # channel = filters.gaussian(channel, sigma=2)
+                channel = filters.median(channel, morphology.disk(2))
+                img_stack.append(channel)
+            else:
+                channel = img_01_normalization(channel)
+                img_stack.append(channel)
+    elif mode == "remove":
+        for chnum in selected_channels:
+            # footprint = morphology.disk(5)
+            channel = img_set[chnum - 1]
+            # footprint = morphology.disk(5)
+            channel = img_01_normalization(channel)
+            channel = exposure.equalize_adapthist(
+                channel, kernel_size=100, clip_limit=0.02
+            )
+            # channel = filters.gaussian(channel, sigma=2)
+            channel = filters.median(channel, morphology.disk(2))
+            img_stack.append(channel)
+    multi_channel_image = np.stack(img_stack, axis=-1)
+    return multi_channel_image
 
 
 def get_multichannel_img_normalized(img_set, selected_channels=[1, 2, 3, 4]):
@@ -200,52 +273,18 @@ def get_multichannel_img_normalized(img_set, selected_channels=[1, 2, 3, 4]):
     return multi_channel_image
 
 
-def img_preprocessing(img_set):
+def get_image_set_name(grouped_files_by_channel, index=1):
     """
-    Preprocess a grayscale image given an list of single-channel grayscale images and stack the image together
+    Get the name of the image set from the specified index in a list of filenames grouped by channel
+    Corresponds to image set index in cellprofiler based on the order in the folder
     Parameters:
-           img_set (list of 2D arrays): a list of 2D arrays representing grayscale images
+          grouped_files_by_channel (2D list of Path objects): an ordered 2D list of file paths grouped by channel and ordered by platemap location
+          index (int, optional): the index to look up the rowcolfield of that image set
     Returns:
-          multi_channel_image (3D array): a 3D array containing the preprocessed grayscale images
+          set_name (str): String name of the image set from the rowcolfield filename nomenclature
     """
-    from skimage import exposure, filters, morphology
-
-    # ch1,ch2,ch3 = io.imread(files[0]), io.imread(files[1]), io.imread(files[3])
-    # channels = [ch1, ch2, ch3]
-    img_stack = []
-    for channel in img_set:
-        # footprint = morphology.disk(5)
-        channel = img_01_normalization(channel)
-        channel = exposure.equalize_adapthist(channel, kernel_size=100, clip_limit=0.05)
-        channel = filters.gaussian(channel, sigma=2)
-        img_stack.append(channel)
-
-    multi_channel_image = np.stack(img_stack, axis=-1)
-    return multi_channel_image
-
-
-def img_preprocessing_v2(img_set):
-    """
-    Preprocess a grayscale image given an list of single-channel grayscale images with historam equalization, and median filter smoothing and stack the image together
-    Parameters:
-           img_set (list of 2D arrays): a list of 2D arrays representing grayscale images
-    Returns:
-          multi_channel_image (3D array): a 3D array containing the preprocessed grayscale images
-    """
-    from skimage import exposure, filters, morphology
-
-    # ch1,ch2,ch3 = io.imread(files[0]), io.imread(files[1]), io.imread(files[3])
-    # channels = [ch1, ch2, ch3]
-    img_stack = []
-    for channel in img_set:
-        # footprint = morphology.disk(5)
-        channel = img_01_normalization(channel)
-        channel = exposure.equalize_adapthist(channel, kernel_size=100, clip_limit=0.02)
-        channel = filters.median(channel, morphology.disk(2))
-        img_stack.append(channel)
-
-    multi_channel_image = np.stack(img_stack, axis=-1)
-    return multi_channel_image
+    set_name = plate_location(grouped_files_by_channel[index - 1].name)
+    return set_name
 
 
 def img_zscore_normalization(img):
@@ -311,276 +350,33 @@ def load_model(model_name=None, gpu=True):
     return model
 
 
-def segment_cell(img, model, show_plot=True):
-    """
-    Run cellpose on a grayscale cell image and return the predicted masks
-    Parameters:
-           img (2D or 3D array): grayscale image to be segmented by cellpose
-           model (Cellpose.model): the cellpose model used for segmentation
-           show (bool, optional): flag whether to show a plot of the predicted mask flow
-    Returns:
-          masks (list of 2D or 3D arrays): the predicted masks from the cellpose model
-    """
-    flow_threshold = 0.5
-    cellprob_threshold = -1
-    tile_norm_blocksize = 0
-    diameter = 60
+def plot_result(image, background):
+    fig, ax = plt.subplots(nrows=1, ncols=3)
 
-    masks, flows, styles = model.eval(
-        img,
-        batch_size=32,
-        diameter=diameter,
-        flow_threshold=flow_threshold,
-        cellprob_threshold=cellprob_threshold,
-        normalize={"tile_norm_blocksize": tile_norm_blocksize},
-    )
-    # plot if true
-    if show_plot:
-        fig = plt.figure(figsize=(12, 5))
-        plot.show_segmentation(fig, img, masks, flows[0])
-        plt.tight_layout()
-        plt.show()
-    return masks
+    ax[0].imshow(image, cmap="gray")
+    ax[0].set_title("Original image")
+    ax[0].axis("off")
+
+    ax[1].imshow(background, cmap="gray")
+    ax[1].set_title("Background")
+    ax[1].axis("off")
+
+    ax[2].imshow(image - background, cmap="gray")
+    ax[2].set_title("Result")
+    ax[2].axis("off")
+
+    fig.tight_layout()
 
 
-def old_segment_cell_v2(
-    img,
-    model,
-    show_plot=True,
-    flow_threshold=0.6,
-    cellprob_threshold=-1,
-    tile_norm_blocksize=100,
-    diameter=60,
-    min_size=500,
-    max_size_frac=0.8,  # keep masks up to 70% of image size
-    niter=1000,
-):
-    """
-    Run cellpose on a grayscale cell image and return the predicted masks
-    Parameters:
-           img (2D or 3D array): grayscale image to be segmented by cellpose
-           model (Cellpose.model): the cellpose model used for segmentation
-           show (bool, optional): flag whether to show a plot of the predicted mask flow
-    Returns:
-          masks (list of 2D or 3D arrays): the predicted masks from the cellpose model
-    """
-    from skimage import filters, morphology
-
-    gfp = img[:, :, 0]  # combine the ch1 and ch2 images to help cellpose out a bit
-    rfp = img[:, :, 1]
-    dapi = img[:, :, 2]  # save ch3 for later
-
-    img_combo = gfp + rfp
-    img_combo = img_01_normalization(img_combo)
-    # sharpen image and improve outline (radius is the gaussian kernel)
-    img_combo = filters.unsharp_mask(img_combo, radius=0.5, amount=2)
-
-    # stack the images
-    img_selected_channels = np.stack([img_combo, dapi], axis=-1)
-
-    masks, flows, styles = model.eval(
-        img_selected_channels,
-        batch_size=64,
-        niter=niter,
-        diameter=diameter,
-        flow_threshold=flow_threshold,
-        cellprob_threshold=cellprob_threshold,
-        normalize={"tile_norm_blocksize": tile_norm_blocksize},
-        max_size_fraction=max_size_frac,
-    )
-    masks = utils.fill_holes_and_remove_small_masks(masks, min_size=min_size)
-    masks = utils.dilate_masks(masks, n_iter=2)
-    # plot if true
-    if show_plot:
-        fig = plt.figure(figsize=(12, 5))
-        plot.show_segmentation(fig, img_selected_channels, masks, flows[0])
-        plt.tight_layout()
-        plt.show()
-    return masks
-
-
-def segment_nuclei(orig_img, model, show_plot=True):
-    """
-    Preprocess a grayscale image of the nuclear channel, run cellpose on the image, and return the predicted masks
-    Parameters:
-           img (2D or 3D array): grayscale image to be segmented by cellpose
-           model (Cellpose.model): the cellpose model used for segmentation
-           show (bool, optional): flag whether to show a plot of the predicted mask flow
-
-    Returns:
-          masks (list of 2D or 3D arrays): the predicted nuclear masks from the cellpose model
-    """
-    from skimage import morphology, exposure, filters
-
-    img = orig_img[:, :, 2]  # get the DAPI channel
-
-    # remove background
-    dog = filters.difference_of_gaussians(img, low_sigma=2.5)
-    seed = np.minimum(dog, img)  # ensure seed is not greater than the original image
-    bg = morphology.reconstruction(seed, img, method="dilation")
-    img = img - bg
-
-    # remove speckle-shaped autofluor
-    bg2 = morphology.white_tophat(img, morphology.disk(3))
-    img = img - bg2
-    img = morphology.closing(img, morphology.disk(2.5))
-    img = filters.gaussian(img, sigma=1)
-
-    flow_threshold = 0.5
-    cellprob_threshold = 0
-    tile_norm_blocksize = 0
-    diameter = None
-
-    masks, flows, styles = model.eval(
-        img,
-        batch_size=32,
-        diameter=diameter,
-        flow_threshold=flow_threshold,
-        cellprob_threshold=cellprob_threshold,
-        normalize={"tile_norm_blocksize": tile_norm_blocksize},
-    )
-    if show_plot:
-        fig = plt.figure(figsize=(12, 5))
-        plot.show_segmentation(fig, img, masks, flows[0])
-        plt.tight_layout()
-        plt.show()
-    return masks
-
-
-def old_segment_nuclei_v2(
+def segment_nuclei_v3(
     orig_img,
     model,
+    nucleus_channel=3,
     show_plot=True,
-    flow_threshold=0.5,
-    cellprob_threshold=1,
-    tile_norm_blocksize=150,
-    min_size=250,
-    max_size_frac=0.4,
-    diameter=None,
-    niter=None,
-):
-    """
-    Preprocess a grayscale image of the nuclear channel, run cellpose on the image, and return the predicted masks
-    Parameters:
-           img (2D or 3D array): grayscale image to be segmented by cellpose
-           model (Cellpose.model): the cellpose model used for segmentation
-           show (bool, optional): flag whether to show a plot of the predicted mask flow
-
-    Returns:
-          masks (list of 2D or 3D arrays): the predicted nuclear masks from the cellpose model
-    """
-    from skimage import morphology, filters
-
-    img = orig_img[:, :, 2]  # get the DAPI channel
-
-    # remove speckle-shaped autofluor
-    bg2 = morphology.white_tophat(img, morphology.disk(3))
-    img = img - bg2
-    img = morphology.closing(img, morphology.disk(2.5))
-    # sharpen image and improve outline (radius is the gaussian kernel)
-    img = filters.gaussian(img, sigma=2)
-    img = img_01_normalization(img)
-
-    masks, flows, styles = model.eval(
-        img,
-        batch_size=64,
-        diameter=diameter,
-        niter=niter,
-        flow_threshold=flow_threshold,
-        cellprob_threshold=cellprob_threshold,
-        normalize={"tile_norm_blocksize": tile_norm_blocksize},
-        max_size_fraction=max_size_frac,
-    )
-    # dilate before removing the ones touching edges to catch the stragglers
-    masks = utils.dilate_masks(masks, n_iter=1)
-    masks_removed_edges = utils.remove_edge_masks(masks)
-    masks_removed_edges = utils.fill_holes_and_remove_small_masks(
-        masks_removed_edges, min_size=min_size
-    )
-
-    if show_plot:
-        fig = plt.figure(figsize=(12, 5))
-        plot.show_segmentation(fig, img, masks_removed_edges, flows[0])
-        plt.tight_layout()
-        plt.show()
-    return masks_removed_edges
-
-
-def segment_cell_v2(
-    img,
-    model,
-    show_plot=True,
-    flow_threshold=0.6,
-    cellprob_threshold=-1,
-    tile_norm_blocksize=100,
-    diameter=60,
-    min_size=500,
-    max_size_frac=0.85,  # keep masks up to 70% of image size
-    niter=1000,
-):
-    """
-    Run cellpose-SAM on a grayscale multichannel cell image and return the predicted masks
-    Designed for a 2160x2160 image rescaled to 1/4 of original size
-    Parameters:
-           img (2D or 3D array): grayscale image to be segmented by cellpose
-           model (Cellpose.model): the cellpose model used for segmentation
-           show_plot (bool, optional): flag whether to show a plot of the predicted mask flow
-           flow_threshold (float, optional): the flow threshold for cellpose, 0.6 by default (from original 0.4 default). Down for more stringent, up for more lenient
-           cellprob_threshold (float, optional): the cell probability threshold for cellpose, -1 by default (from original 0 default).
-           tile_norm_blocksize (int, optional): the tile normalization blocksize for cellpose, 100 by default. Generally between 100-200; 0 to turn off
-           diameter (int or None, optional): the diameter for cellpose, 60 as experimentally determined, but None by default
-           min_size (int, optional): the minimum size of masks to keep, 500 pixels by default
-           max_size_frac (float, optional): the maximum size of masks to keep as a fraction of the image size, 0.85 by default
-           niter (int or None, optional): the number of iterations for cellpose, None by default
-    Returns:
-          masks (list of 2D or 3D arrays): the predicted masks from the cellpose model
-    """
-    from skimage import filters, morphology, exposure
-
-    gfp = img[:, :, 0]  # combine the ch1 and ch2 images to help cellpose out a bit
-    rfp = img[:, :, 1]
-    dapi = img[:, :, 2]  # save ch3 for later
-
-    img_combo = gfp + rfp
-    img_combo = img_01_normalization(img_combo)
-    # tf.imshow(img_combo, cmap="viridis")
-    # smooth image and improve outline (sigma is the gaussian kernel)
-    img_combo = filters.gaussian(img_combo, sigma=1)
-    # Can also use unsharp mask, but it tends to chop the outlines too short img_combo = filters.unsharp_mask(img_combo, radius=0.5, amount=2)
-
-    # stack the images
-    img_selected_channels = np.stack([img_combo, dapi], axis=-1)
-
-    masks, flows, styles = model.eval(
-        img_selected_channels,
-        batch_size=64,
-        niter=niter,
-        diameter=diameter,
-        flow_threshold=flow_threshold,
-        cellprob_threshold=cellprob_threshold,
-        normalize={"tile_norm_blocksize": tile_norm_blocksize},
-        max_size_fraction=max_size_frac,
-        min_size=min_size,
-    )
-    masks = utils.fill_holes_and_remove_small_masks(masks, min_size=min_size)
-    masks = utils.dilate_masks(masks, n_iter=2)
-    # plot if true
-    if show_plot:
-        fig = plt.figure(figsize=(12, 5))
-        plot.show_segmentation(fig, img_selected_channels, masks, flows[0])
-        plt.tight_layout()
-        plt.show()
-    return masks
-
-
-def segment_nuclei_v2(
-    orig_img,
-    model,
-    show_plot=True,
-    flow_threshold=0.5,
-    cellprob_threshold=1,
-    tile_norm_blocksize=100,
-    min_size=400,
+    flow_threshold=0.4,
+    cellprob_threshold=0,
+    tile_norm_blocksize=0,
+    min_size=50,
     max_size_frac=0.4,
     diameter=None,
     niter=None,
@@ -604,18 +400,28 @@ def segment_nuclei_v2(
     """
     from skimage import morphology, filters
 
-    img = orig_img[:, :, 2]  # get the DAPI channel
+    img = orig_img[:, :, nucleus_channel - 1]  # get the DAPI channel (and 0-index it)
 
     # remove speckle-shaped autofluor
-    bg2 = morphology.white_tophat(img, morphology.disk(3))
-    img = img - bg2
-    img = morphology.closing(img, morphology.disk(2.5))
+    # bg2 = morphology.white_tophat(img, morphology.disk(3))
+    # img = img - bg2
+    # img = morphology.closing(img, morphology.disk(2.5))
 
-    # sharpen image and improve outline (radius is the gaussian kernel)
     img = img_01_normalization(img)
-    img = filters.gaussian(img, sigma=2)
     # tf.imshow(img, cmap="plasma")
-    # img = filters.unsharp_mask(img, radius=1, amount=2)
+    # do a rolling ball background subtraction
+    from skimage import data, restoration, util
+
+    background = restoration.rolling_ball(
+        img, kernel=restoration.ellipsoid_kernel((25, 25), 0.1)
+    )
+
+    img = img - background
+    img = img_01_normalization(img)
+    # plot_result(img, background)
+    # plt.show()
+    img = filters.gaussian(img, sigma=1)
+
     masks, flows, styles = model.eval(
         img,
         batch_size=64,
@@ -632,13 +438,98 @@ def segment_nuclei_v2(
     masks_removed_edges = utils.fill_holes_and_remove_small_masks(
         masks_removed_edges, min_size=min_size
     )
-
     if show_plot:
         fig = plt.figure(figsize=(12, 5))
         plot.show_segmentation(fig, img, masks_removed_edges, flows[0])
         plt.tight_layout()
         plt.show()
     return masks_removed_edges
+
+
+def segment_cell_hap1(
+    img,
+    model,
+    selected_channels=[1, 2, 3, 4],
+    nucleus_channel=3,
+    show_plot=True,
+    flow_threshold=0.4,
+    cellprob_threshold=0,
+    tile_norm_blocksize=100,
+    diameter=None,
+    min_size=200,
+    max_size_frac=0.4,  # keep masks up to 70% of image size
+    niter=None,
+):
+    """
+    Run cellpose-SAM on a grayscale multichannel cell image and return the predicted masks
+    Designed for a 2160x2160 image rescaled to 1/4 of original size
+    Parameters:
+           img (2D or 3D array): grayscale image to be segmented by cellpose
+           model (Cellpose.model): the cellpose model used for segmentation
+           show_plot (bool, optional): flag whether to show a plot of the predicted mask flow
+           flow_threshold (float, optional): the flow threshold for cellpose, 0.4 by default (from original 0.4 default). Down for more stringent, up for more lenient
+           cellprob_threshold (float, optional): the cell probability threshold for cellpose, from original 0 default.
+           tile_norm_blocksize (int, optional): the tile normalization blocksize for cellpose, 100 by default. Generally between 100-200; 0 to turn off
+           diameter (int or None, optional): the diameter for cellpose, 60 as experimentally determined on MRC, but None by default
+           min_size (int, optional): the minimum size of masks to keep, 200 pixels by default
+           max_size_frac (float, optional): the maximum size of masks to keep as a fraction of the image size, 0.4 by default
+           niter (int or None, optional): the number of iterations for cellpose, None by default
+    Returns:
+          masks (list of 2D or 3D arrays): the predicted masks from the cellpose model
+    """
+    from skimage import filters, morphology, exposure
+
+    channels_to_add_list = []
+    try:
+        for chnum in selected_channels:
+            zeroindex_chnum = chnum - 1
+            if chnum == nucleus_channel:
+                continue
+            else:
+                ch = img[:, :, zeroindex_chnum]
+                channels_to_add_list.append(ch)
+        # stack everything in the list (excludes nuclei channel)
+        segment_image_pre = np.stack(channels_to_add_list, axis=-1)
+    except IndexError as e:
+        print(
+            f"Error: you selected {len(selected_channels)} channels, when your image only has {np.shape(img)[-1]} channels"
+        )
+        raise e
+    if len(selected_channels) > 2:
+        segment_image = np.sum(segment_image_pre, axis=-1)
+    else:
+        segment_image = channels_to_add_list[0]
+
+    # now we have nuclei seperated from the cyto segment image
+    segment_image = img_01_normalization(segment_image)
+    nuc_image = img[:, :, nucleus_channel - 1]
+    # tf.imshow(img_combo, cmap="viridis")
+    # smooth image and improve outline (sigma is the gaussian kernel)
+    segment_image = filters.gaussian(segment_image, sigma=1)
+    # Can also use unsharp mask, but it tends to chop the outlines too short img_combo = filters.unsharp_mask(img_combo, radius=0.5, amount=2)
+    # stack the images
+    img_selected_channels = np.stack([segment_image, nuc_image], axis=-1)
+
+    masks, flows, styles = model.eval(
+        img_selected_channels,
+        batch_size=64,
+        niter=niter,
+        diameter=diameter,
+        flow_threshold=flow_threshold,
+        cellprob_threshold=cellprob_threshold,
+        normalize={"tile_norm_blocksize": tile_norm_blocksize},
+        max_size_fraction=max_size_frac,
+        min_size=min_size,
+    )
+    masks = utils.fill_holes_and_remove_small_masks(masks, min_size=min_size)
+    masks = utils.dilate_masks(masks, n_iter=2)
+    # plot if true
+    if show_plot:
+        fig = plt.figure(figsize=(12, 5))
+        plot.show_segmentation(fig, img_selected_channels, masks, flows[0])
+        plt.tight_layout()
+        plt.show()
+    return masks
 
 
 def save_masks(set_name, masks, outdir, image_ext=".tif", mask_type="cell"):
@@ -681,24 +572,24 @@ def save_mask_folder(
 
     for i in trange(len(grouped_files_by_channel)):
         file_group = grouped_files_by_channel[i]
-        img_set = load_image_set(file_group, nchannels)
+        img_set = load_image_set_hap1(file_group, nchannels)
         img_set_name = get_image_set_name(file_group)
         # print("Set name: ", img_set_name)
         if v2:
-            stacked_img = img_preprocessing_v2(img_set)
+            stacked_img = img_preprocessing_hap1(img_set)
         else:
             # old function
-            stacked_img = img_preprocessing(img_set)
+            stacked_img = img_preprocessing_hap1(img_set)
 
         # rescale to 512 by 512 for processing speed
         rescaled_img = img_rescaled(stacked_img, factor=resize_factor)
 
         if v2:
-            nuc_masks = segment_nuclei_v2(rescaled_img, model, show_plot=False)
+            nuc_masks = segment_nuclei_v3(rescaled_img, model, show_plot=False)
             save_masks(
                 img_set_name, nuc_masks, outdir, image_ext=image_ext, mask_type="nuclei"
             )
-            cell_masks = segment_cell_v2(rescaled_img, model, show_plot=False)
+            cell_masks = segment_cell_hap1(rescaled_img, model, show_plot=False)
             save_masks(
                 img_set_name,
                 cell_masks,
@@ -707,11 +598,11 @@ def save_mask_folder(
                 mask_type="v2_cell",
             )
         else:
-            nuc_masks = segment_nuclei(rescaled_img, model, show_plot=False)
+            nuc_masks = segment_nuclei_v3(rescaled_img, model, show_plot=False)
             save_masks(
                 img_set_name, nuc_masks, outdir, image_ext=image_ext, mask_type="nuclei"
             )
-            cell_masks = segment_cell(rescaled_img, model, show_plot=False)
+            cell_masks = segment_cell_hap1(rescaled_img, model, show_plot=False)
             save_masks(
                 img_set_name, cell_masks, outdir, image_ext=image_ext, mask_type="cell"
             )
@@ -751,7 +642,7 @@ def preload_and_save_masks(
     grouped_files_by_channel = group_files_by_channel(ordered_files, nchannels)
     # if you have small images, you may want to load all of them first and then run, so that they can be batched together on the GPU
     print("loading images")
-    imgs = load_image_set(
+    imgs = load_image_set_hap1(
         [grouped_files_by_channel[i] for i in trange(len(grouped_files_by_channel))],
         nchannels,
     )
